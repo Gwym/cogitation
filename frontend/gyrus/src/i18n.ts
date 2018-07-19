@@ -92,10 +92,12 @@ namespace Gyrus {
 
 }
 
+console.log('i18n.gyrus: fr '  )
+
 // current langage selection TODO (2) : dynamic configuration on page ? from server configuration ? from browser langage ?
 let i18n = {
-	gyrus: Gyrus.i18n_fr,
-	sulcus: Sulcus.i18n_fr
+	gyrus: Gyrus.i18n_fr
+	//, sulcus: Sulcus.i18n_fr
 }
 
 

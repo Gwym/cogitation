@@ -1,5 +1,4 @@
 
-
 function setUserSession(authId: string | false) {
 
   if (typeof authId === 'string') {
@@ -190,6 +189,7 @@ var XSubmitLogin = function (form: HTMLFormElement) {
   xReq.send();
 }
 
+console.log('declare XCheckSession')
 // index.html onload 
 // TODO (0) CORS
 var XCheckSession = function (form: HTMLFormElement) {

@@ -1,12 +1,17 @@
 
 
-window.addEventListener('load', startSignal)
+// TODO (2) : no auto load, convert to loadable Experiement
+// window.addEventListener('load', startSignal)
 
 function startSignal() {
 
   console.log('Signal > loading')
 
   let contexts: CanvasRenderingContext2D[] = [], canvas = document.querySelectorAll('canvas')
+
+  if (canvas.length === 0) {
+    throw ('no canavas element') // TODO (2) : auto-create
+  }
 
   for (var i = 0; i < canvas.length; i++) {
     contexts[i] = <CanvasRenderingContext2D>canvas[i].getContext("2d");

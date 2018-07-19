@@ -57,15 +57,17 @@
     "gyrus/src/admin.ts",
     "gyrus/src/lab/laboratory.ts",
 
-    "signal/src/signal/signal.ts",
-    "signal/src/linear_plot_2d.ts",
-    "signal/src/polar_plot_2d.ts",
-    "signal/src/xy_plot_2d.ts",
-    "signal/src/signal_main.ts",
-    
     "sulcus/src/i18n.ts",
     "sulcus/src/ui.ts",
     "sulcus/src/engine.ts",
-    "sulcus/src/main.ts"
+    "sulcus/src/main.ts",
+
+    "signal/src/signal.ts",
+    "signal/src/linear_plot_2d.ts",
+    "signal/src/polar_plot_2d.ts",
+    "signal/src/xy_plot_2d.ts",
+    "signal/src/signal_main.ts"
+    
+
   ]
 }
