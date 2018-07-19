@@ -1,0 +1,25 @@
+# Logs
+logs
+*.log
+*.txt
+
+# sourcemap
+*.map
+
+# Dependency directories
+node_modules
+
+# EDI
+.vscode
+
+# configuration
+configuration.json
+
+# build
+build
+epigen/gen_shared_frontend.js
+epigen/run_tests.js
+frontend/epigen/src/shared.gen.ts
+frontend/js/client.js
+frontend/sandbox
+tmp
