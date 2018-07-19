@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../css/style.css">
+	<title>Sulcus</title>
+	<meta name="description" content="">
+	<meta name="keywords" content="">
+	<script type="text/javascript" src="../../js/client.js" defer></script>
+	<script type="text/javascript" defer>
+		window.addEventListener("load", function () {
+			createSulcusEngine();
+		});
+	</script>
+</head>
+
+<body>
+	<header>
+		<div id="logo"><img src="logo.png" alt="sulcus" /></div>
+	</header>
+	<div id="info_box"></div>
+	<article>
+		<section class="locutor">
+			<h1>Bonjour !</h1>
+			<button id="button_bootstrap" title="Bootstrap" >Bootstraper</button>
+			<div id="sulcus_panel">
+				<p>Initialisation et prise de contrôle, merci de ne pas utiliser le clavier ou la souris</p>
+				<button id="button_mise_en_abyme" title="Mise en abyme">Mise en abyme</button>
+				<p>Pour stopper le contrôle par Sulcus, fermez cette fenêtre (ou onglet).</p>
+			</div>
+			<div>
+				<div class="color_red"></div>
+				<div class="color_green"></div>
+				<div class="color_blue"></div>
+			</div>
+        </section>
+	</article>
+</body>
+
+</html>

@@ -1,0 +1,7 @@
+{
+    "shared": [
+        "../gyrus/src/services/shared/messaging.ts",
+        "../sulcus/src/shared/messaging.ts"
+    ],
+    "outfilename": "../frontend/epigen/src/shared.gen.ts"
+}

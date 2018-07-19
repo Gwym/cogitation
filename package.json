@@ -1,0 +1,36 @@
+{
+  "name": "cogitation",
+  "version": "0.0.1",
+  "description": "Cogitation engine in Typescript",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "ts-node tests/tests.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gwym/cogitation.git"
+  },
+  "keywords": [
+    "cogitation",
+    "multislot",
+    "inertial",
+    "geometry",
+    "yenah"
+  ],
+  "author": "Gwym",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Gwym/cogitation/issues"
+  },
+  "homepage": "https://github.com/Gwym/cogitation#readme",
+  "dependencies": {
+    "@types/bcryptjs": "^2.4.1",
+    "@types/mongodb": "^3.1.1",
+    "@types/node": "^10.5.2",
+    "@types/ws": "^5.1.2",
+    "bcryptjs": "^2.4.3",
+    "mongodb": "^3.1.1",
+    "source-map-support": "^0.5.6",
+    "ws": "^5.2.2"
+  }
+}

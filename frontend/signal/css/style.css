@@ -1,0 +1,14 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+    background: black;
+    color: white;
+    font-family: sans-serif;
+}
+
+canvas {
+    border : 1px solid darkblue
+}
