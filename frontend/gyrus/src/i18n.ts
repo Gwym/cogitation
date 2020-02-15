@@ -58,6 +58,7 @@ namespace Gyrus {
 		, websocket_connected: string
 		, websocket_disconnected: string
 		, loading: string
+		, submit: string
 	}
 
 	export let i18n_en: GyrusCorpus = {
@@ -73,6 +74,7 @@ namespace Gyrus {
 		, websocket_connected: 'Websocket connected'
 		, websocket_disconnected: 'Websocket disconnected'
 		, loading: 'Loading'
+		, submit: 'Submit'
 	}
 
 	export let i18n_fr: GyrusCorpus = {
@@ -88,6 +90,7 @@ namespace Gyrus {
 		, websocket_connected: 'Websocket connecté'
 		, websocket_disconnected: 'Websocket déconnecté'
 		, loading: 'Chargement'
+		, submit: 'Valider'
 	}
 
 }

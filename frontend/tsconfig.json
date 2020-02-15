@@ -1,17 +1,19 @@
 {
   "compilerOptions": {
     /* Basic Options */
-    "target": "es6", /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', or 'ESNEXT'. */
-    //"module": "commonjs",                     /* Specify module code generation: 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
-    // "lib": [],                             /* Specify library files to be included in the compilation:  */
+    "target": "ESNEXT", /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017','ES2018' or 'ESNEXT'. */
+    //"module": "commonjs",                     /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
+    // "lib": [],                             /* Specify library files to be included in the compilation. */
     // "allowJs": true,                       /* Allow javascript files to be compiled. */
     // "checkJs": true,                       /* Report errors in .js files. */
     // "jsx": "preserve",                     /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */
     // "declaration": true,                   /* Generates corresponding '.d.ts' file. */
+    // "declarationMap": true,                /* Generates a sourcemap for each corresponding '.d.ts' file. */
     "sourceMap": true, /* Generates corresponding '.map' file. */
     "outFile": "./js/client.js", /* Concatenate and emit output to single file. */
     // "outDir": "./",                        /* Redirect output structure to the directory. */
     // "rootDir": "./",                       /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
+    // "composite": true,                     /* Enable project compilation */
     // "removeComments": true,                /* Do not emit comments to output. */
     // "noEmit": true,                        /* Do not emit outputs. */
     // "importHelpers": true,                 /* Import emit helpers from 'tslib'. */
@@ -21,13 +23,15 @@
     "strict": true, /* Enable all strict type-checking options. */
     "noImplicitAny": true, /* Raise error on expressions and declarations with an implied 'any' type. */
     "strictNullChecks": true, /* Enable strict null checks. */
+    "strictFunctionTypes": true, /* Enable strict checking of function types. */
+    "strictPropertyInitialization": true, /* Enable strict checking of property initialization in classes. */
     "noImplicitThis": true, /* Raise error on 'this' expressions with an implied 'any' type. */
     "alwaysStrict": true, /* Parse in strict mode and emit "use strict" for each source file. */
     /* Additional Checks */
     "noUnusedLocals": true, /* Report errors on unused locals. */
     "noUnusedParameters": true, /* Report errors on unused parameters. */
     "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
-    "noFallthroughCasesInSwitch": true /* Report errors for fallthrough cases in switch statement. */
+    "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
     /* Module Resolution Options */
     // "moduleResolution": "node",            /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
     // "baseUrl": "./",                       /* Base directory to resolve non-absolute module names. */
@@ -36,9 +40,11 @@
     // "typeRoots": [],                       /* List of folders to include type definitions from. */
     // "types": [],                           /* Type declaration files to be included in compilation. */
     // "allowSyntheticDefaultImports": true,  /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
+    "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+    // "preserveSymlinks": true,              /* Do not resolve the real path of symlinks. */
     /* Source Map Options */
-    // "sourceRoot": "./",                    /* Specify the location where debugger should locate TypeScript files instead of source locations. */
-    // "mapRoot": "./",                       /* Specify the location where debugger should locate map files instead of generated locations. */
+    // "sourceRoot": "",                      /* Specify the location where debugger should locate TypeScript files instead of source locations. */
+    // "mapRoot": "",                         /* Specify the location where debugger should locate map files instead of generated locations. */
     // "inlineSourceMap": true,               /* Emit a single file with source maps instead of having a separate file. */
     // "inlineSources": true,                 /* Emit the source alongside the sourcemaps within a single file; requires '--inlineSourceMap' or '--sourceMap' to be set. */
     /* Experimental Options */
@@ -47,27 +53,132 @@
   },
   "files": [
     "epigen/src/shared.gen.ts",
-
     "gyrus/src/i18n.ts",
     "gyrus/src/xjson.ts",
     "gyrus/src/logger.ts",
     "gyrus/src/base/ui.ts",
     "gyrus/src/channel.ts",
     "gyrus/src/base/pointer.ts",
+    "gyrus/src/services/sesam.ts",
     "gyrus/src/admin.ts",
+    "gyrus/src/model/model_base.ts",
     "gyrus/src/lab/laboratory.ts",
-
-    "sulcus/src/i18n.ts",
-    "sulcus/src/ui.ts",
-    "sulcus/src/engine.ts",
-    "sulcus/src/main.ts",
-
+    "gyrus/src/lab/scenario.ts",
+    "gyrus/src/lab/experiment_base.ts",
+    "gyrus/src/lab/experiment2D.ts",
+    "gyrus/src/lab/experiment3D.ts",
+    "gyrus/src/lab/experiment_verify.ts",
+    "gyrus/src/lab/experiment_scenarist.ts",
+    // "multislot/src/utilz/facts_registar.ts",
+    // "multislot/src/utilz/tree_wanderer.ts",
+    // "multislot/src/utilz/multislot_knowlege_base.ts",
+    // "multislot/src/algebra/algebra_base_initialisation.ts",
+    // "multislot/src/algebra/symbolic_algebra_base.ts",
+    // "multislot/src/algebra/algorithm.ts",
+    // "multislot/src/algebra/algorithm.test.ts",
+    //  "multislot/src/algebra/matrix.ts",
+    // "multislot/src/algebra/symbolic_recursive_matrix.ts",
+    // "multislot/src/algebra/symbolic_recursive_matrix_test.ts",
+    // "multislot/src/generator/gi_dynamic_itemz.ts",
+    // "multislot/src/generator/gi_space_dynamic_c3.ts",
+    // "multislot/src/space/multislot.ts",
+    // "multislot/src/space/multislot_test.ts",
+    // "multislot/src/space/multispace.ts",
+    // "multislot/src/space/multivector.ts",
+    // "multislot/src/space/symbolic_multislot_item.ts",
+    // "multislot/src/space/symbolic_multislot_itemz.ts",
+    // "multislot/src/space/symbolic_multislot_space.ts",
+    // "multislot/src/space/symbolic_multislot_space_C3.ts",
+    // "multislot/src/space/symbolic_coordinate_system.ts",
+    // "multislot/src/space/symbolic_multislot_versor.ts",
+    // "multislot/src/generator/base_multislot.ts",
+    // "multislot/src/generator/gi_space_base.ts",
+    // "multislot/src/generator/generator_framework.ts",
+    // "multislot/src/generator/space_C3.gen.ts",
+    // "multislot/src/generator/gi_space_C3_base.ts",
+    // "multislot/src/algebra/algebra_base_finalisation.ts",
+    // "multislot/src/generator/versor_dyn_space.ts",
+    // "multislot/src/algebra/matrix_test.ts",
+    // "multislot/src/algebra/symbolic_algebra_base.test.ts",
+    // "multislot/src/space/geometric_space_R2.ts",
+    // "multislot/src/space/GA_4D.ts",
+    // "multislot/src/space/GA_4D.test.ts",
+    // "multislot/src/space/geometric_space_C3.ts",
+    // "multislot/src/space/triangulate.ts",
+    "multislot/src/visual/five.ts",
+    // "multislot/src/test/inertial_geometry.test.ts",
+    // "multislot/src/lab/multislot_experiment2D.ts",
+    // "multislot/src/lab/multislot_experiment_verify.ts",
+    // "multislot/src/lab/multislot_experiment_scenarist.ts",
+    // "multislot/src/test/inertial_geometry_scenarist.ts",
+    // "multislot/src/lab/coordinate_system/coordinate_system_experiment3D.ts",
+    // "multislot/src/lab/coordinate_system/coordinate_system_particle_system.ts",
+    // "signal/src/model/signal_model2D.ts",
+    // "signal/src/lab/signal_experiment2D.ts",
+    // "signal/src/lab/exponential_experiment2D.ts",
+    // "signal/src/lab/zeta_experiment2D.ts",
     "signal/src/signal.ts",
     "signal/src/linear_plot_2d.ts",
     "signal/src/polar_plot_2d.ts",
     "signal/src/xy_plot_2d.ts",
-    "signal/src/signal_main.ts"
-    
-
+    "signal/src/signal_main.ts",
+    // "signal/src/test/signal_test.ts",
+    "swag/src/core/math.ts",
+    // "swag/src/space/field.ts",
+    // "swag/src/space/uniform_grid.ts",
+    // "swag/src/space/nested_grid.ts",
+    // "swag/src/space/distribution.ts",
+    // "swag/src/fluid/kernel_smoother.ts",
+    "swag/src/fluid/fluid_model.ts",
+    /* "swag/src/fluid/velocity.ts",
+    "swag/src/fluid/vortcity.ts",
+    "swag/src/fluid/viscosity.ts",
+    "swag/src/fluid/drag.ts",
+    "swag/src/fluid/surface_tension.ts",*/
+    "swag/src/fluid/particle/particle_system.ts",
+    /*"swag/src/fluid/particle/sph_particle_system.ts",
+    "swag/src/fluid/particle/direct_vorton_particle_system.ts",
+    "swag/src/fluid/particle/vorton_particle_system.ts",*/
+    "swag/src/fluid/particle/hyperfluid_particle_system.ts",
+    /*"swag/src/fluid/particle/direct_sph_particle_system.ts",
+    "swag/src/fluid/particle/gas_particle_system.ts",
+    "swag/src/fluid/particle/curve_particle_system.ts",
+    "swag/src/fluid/particle/multislot_particle_system.ts",
+    "swag/src/fluid/particle/blob_particle_system.ts",
+    "swag/src/rigid/rigid.ts",
+    "swag/src/rigid/collision_model.ts",
+    "swag/src/space/collision_distribution.ts",
+    "swag/src/space/collision_distribution.test.ts",
+    "swag/src/space/bufo_distribution.ts",
+    "swag/src/rigid/particle/collision_particle_system.ts",
+    "swag/src/lab/sph_experiment.ts",
+    "swag/src/lab/vorton_experiment.ts",
+    "swag/src/lab/collision_experiment.ts",
+    "swag/src/lab/gas_experiment.ts",
+    "swag/src/lab/curve_experiment.ts",
+    "swag/src/lab/swag_experiment_verify.ts",
+    "swag/src/lab/bufo_experiment2D.ts",
+    "swag/src/lab/stochastic_experiment2D.ts",
+    "swag/src/lab/quantum_experiment2D.ts",
+    "swag/src/lab/multislot_boost_experiment3D.ts",
+    "swag/src/lab/multislot_blob_experiment3D.ts",*/
+    "swag/src/lab/hyperfluid_experiment.ts",
+    // "swag/src/lab/solar_system/solar_system_particle_system.ts",
+    // "swag/src/lab/solar_system/solar_system_experiment3D.ts",
+    "swag/src/test/swag_test.ts",
+    "sulcus/src/i18n.ts",
+    "sulcus/src/ui.ts",
+    "sulcus/src/engine.ts",
+    "sulcus/src/main.ts",
+    // "sulcus/src/base/physics_base.ts",
+    // "sulcus/src/base/physics_typed.ts",
+    // "sulcus/src/base/physics_constants.ts",
+    // "sulcus/src/base/physics_planck.ts",
+    // "sulcus/src/lab/neural_network_experiment2D.ts",
+    // "sulcus/src/lab/neural_network_experiment3D.ts",
+    "sulcus/src/lab/sulcus_experiment_verify.ts",
+    // "sulcus/src/base/sulcus_base.test.ts",
+    "sulcus/src/test/sulcus_test.ts",
+    // "swag/src/lab/solar_system/mercury/perihelie.ts"
   ]
 }

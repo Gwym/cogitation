@@ -19,7 +19,7 @@ interface ClientLogger {
 
 // TODO (1) : remote dbg : error, assert, throw, catch...
 
-var dbg: ClientLogger = {
+/*var dbg: ClientLogger = {
     log(a: any) {
         console.log(a);
     },
@@ -38,4 +38,4 @@ var dbg: ClientLogger = {
     assert(test: boolean, msg: string) {
         console.assert(test, msg);
     }
-}
+} */

@@ -39,7 +39,7 @@ try {
     let outFilename = path.resolve(__dirname, config.outfilename)
 
     var outContent = '// WARNING : GENERATED FILE, DO NOT MODIFY (modify server shared files ' + "\n"
-        + '// and run node build/epigen/gen_shared_frontend.js from workspace root directory' + "\n\n";
+        + '// and run node epigen/gen_shared_frontend.js' + "\n\n";
 
     for (let inFile of inFiles) {
 
@@ -47,7 +47,7 @@ try {
 
         let inFilename = path.resolve(__dirname, inFile)
 
-        console.log('Read ' + inFilename)
+        console.log('Reading ' + inFilename)
 
         let inContent = fs.readFileSync(inFilename, 'utf8');
         inContent = inContent.replace(/export /g, '') + "\n\n";
@@ -59,6 +59,8 @@ try {
 
         console.log('Read ' + path.resolve(inFilename));
     }
+
+    console.log('Writing ' + outFilename)
 
     fs.writeFileSync(outFilename, outContent, 'utf8');
 

@@ -13,7 +13,7 @@ import { UserSession } from "../services/dispatcher"
 import { InsertWriteOpResult, MongoClient, Db, Collection, WriteError, ObjectID, BulkWriteResult } from "mongodb"
 
 //export interface UpdateResult extends UpdateWriteOpResult { }
-export interface InsertResult extends InsertWriteOpResult { }
+export interface InsertResult extends InsertWriteOpResult<{ _id: any }> { }
 // export interface BulkSaveResult extends BulkWriteResult { }
 
 export class BaseMongoPersistor extends AsyncPersistor {

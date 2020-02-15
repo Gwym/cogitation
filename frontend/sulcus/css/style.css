@@ -251,3 +251,9 @@ article {
     background-color: blue
 }
 
+/* S C E N A R I S T */
+
+
+#scenarist_panel {
+    visibility: hidden;
+}

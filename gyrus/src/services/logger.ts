@@ -4,6 +4,8 @@ import * as path from 'path'
 
 export enum LoggerParts { None = 0, Filename = 1, Code = 2, All = 3 }
 
+// TODO (3) : https://github.com/Microsoft/language-server-protocol-inspector#log-format
+
 export interface Logger {
   log(s: any, parts?: LoggerParts): void
   info(s: string): void

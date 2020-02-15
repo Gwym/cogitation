@@ -3,5 +3,8 @@
         "../gyrus/src/services/shared/messaging.ts",
         "../sulcus/src/shared/messaging.ts"
     ],
+    "unshared": [
+        "../gyrus/src/services/shared/sesam.ts"
+    ],
     "outfilename": "../frontend/epigen/src/shared.gen.ts"
 }

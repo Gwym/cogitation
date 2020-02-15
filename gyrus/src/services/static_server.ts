@@ -17,7 +17,8 @@ export class StaticServer {
     rootPath: string
     defaultIndexFile = '/index.html'
     resHeaders: { [index: string]: string } = {
-        "Cache-Control": "max-age=2592000", // 1 month
+       //  "Cache-Control": "max-age=2592000", // 1 month
+       "Cache-Control": "no-cache, no-store, must-revalidate", // TODO (0) : debug option
         "server": "node"
     }
 
@@ -71,6 +72,8 @@ export class StaticServer {
     }
 
     constructor(rootPath = '.', options?: StaticServerOptions) {
+
+        console.log('TODO (0) : CACHE-CONTROL settings')
 
         this.rootPath = path.normalize(path.resolve(rootPath))
 

@@ -1,6 +1,6 @@
 import { dbg } from '../services/logger'
 import { UserOptions, MessageType, c2s_ChannelMessage, ErrMsg, AdminRequest } from '../services/shared/messaging'
-import { Dispatcher, UserSession } from '../services/dispatcher'
+import { Dispatcher, UserSession, UserSessionInterface } from '../services/dispatcher'
 import { AdminDispatcher } from './admin'
 
 export class BaseServerEngine extends Dispatcher {
@@ -30,17 +30,22 @@ export class BaseServerEngine extends Dispatcher {
 
     dispatchWsCommand(cmd: c2s_ChannelMessage, user: UserSession): void {
 
-       /* if (cmd.type === MessageType. ...) {
-
-            ...
-        } else */
+        /* if (cmd.type === MessageType. ...) {
+ 
+             ...
+         } else */
         if (cmd.type === MessageType.Admin) {
             // TODO (0) : if (user.isAdministrator) ... // access management : user or global ? 
             this.adminDispatcher.dispatchWsAdminCommand(<AdminRequest>cmd, user)
         }
         else {
-            console.error('dispatchWsCommand > Unknown type ' + cmd.type)
+            console.error('dispatchWsCommand > Unhandled type ' + cmd.type + ' ' + MessageType[cmd.type])
             user.send(ErrMsg.UnkownCommand)
         }
+    }
+
+    dispatchBinary(message: Buffer | ArrayBuffer | Buffer[], _user: UserSessionInterface): void {
+        console.log('BaseServerEngine > dispatchBinary')
+        console.log(message)
     }
 }

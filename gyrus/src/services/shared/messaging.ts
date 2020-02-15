@@ -11,7 +11,7 @@ export interface UserOptions {
 // FIXME (0) : REF EXTEND_ENUM
 // cannot extend enums, use type = parentType | ... or classes ?
 export enum MessageType {
-  Error, Registration, ConfigureRegistration, Login, SessionCheck, User, Admin,
+  Error, Registration, ConfigureRegistration, Login, SessionCheck, User, Admin, ExperimentMessage,
   _last // keep at last position ~ enum extends
 }
 
@@ -119,4 +119,19 @@ export interface BaseAdminInformations extends s2c_ChannelMessage {
   tracks: number
   sessions: number
   users: number
+}
+
+export interface ExperimentMessage {
+  kind: number
+  experimentId: number
+}
+
+export interface ExperimentRequest extends c2s_ChannelMessage {
+  type: MessageType.ExperimentMessage
+  message: ExperimentMessage
+}
+
+export interface ExperimentAck extends s2c_ChannelMessage {
+  type: MessageType.ExperimentMessage
+  message: ExperimentMessage
 }

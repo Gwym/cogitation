@@ -3,7 +3,7 @@
 
 class SulcusUi extends BaseHtmlUI {
 
-    protected channel: Channel
+    protected channel?: Channel
 
     constructor(container: HTMLElement) {
         super(container)
@@ -15,13 +15,23 @@ class SulcusUi extends BaseHtmlUI {
         let bootstrapButton = document.getElementById('button_bootstrap')
         if (bootstrapButton) {
             bootstrapButton.addEventListener('click', () => {
-                console.log('click bootstrap')
-                let bootstrapReq: BootstrapRequest = { type: SulcusMessageType.Bootstrap }
-                this.channel.send(bootstrapReq)
+                console.log('click bootstrap ' + this.channel)
+                if (this.channel) {
+                    let bootstrapReq: BootstrapRequest = { type: SulcusMessageType.Bootstrap }
+                    this.channel.send(bootstrapReq)
+                }
             })
         }
         else {
             throw 'HtmlElement id: button_bootstrap not found'
+        }
+    }
+
+    private recursionRequest = () => {
+        console.log('click mise en abyme ' + this.channel)
+        if (this.channel) {
+            let recursionReq: RecursionRequest = { type: SulcusMessageType.Recursion }
+            this.channel.send(recursionReq)
         }
     }
 
@@ -36,11 +46,7 @@ class SulcusUi extends BaseHtmlUI {
         }
         let miseEnAbymeButton = document.getElementById('button_mise_en_abyme')
         if (miseEnAbymeButton) {
-            miseEnAbymeButton.addEventListener('click', () => {
-                console.log('click mise en abyme')
-                let recursionReq: RecursionRequest = { type: SulcusMessageType.Recursion }
-                this.channel.send(recursionReq)
-            })
+            miseEnAbymeButton.addEventListener('click', this.recursionRequest)
         }
     }
 
@@ -48,7 +54,7 @@ class SulcusUi extends BaseHtmlUI {
 
         let miseEnAbymeButton = document.getElementById('button_mise_en_abyme')
         if (miseEnAbymeButton) {
-            miseEnAbymeButton.removeEventListener('click')
+            miseEnAbymeButton.removeEventListener('click', this.recursionRequest)
             miseEnAbymeButton.style.visibility = 'hidden'
             // TODO (0) : inform user 
         }

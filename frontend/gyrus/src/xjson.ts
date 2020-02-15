@@ -2,43 +2,43 @@
 function setUserSession(authId: string | false) {
 
   if (typeof authId === 'string') {
-    var date = new Date();
-    date.setTime(date.getTime() + cookieExpiration);
-    document.cookie = 'authId=' + authId + '; expires=' + date.toUTCString();
-    console.log('setUserAuth > identification ok, authId:' + authId + ' cookie:' + document.cookie);
+    let date = new Date()
+    date.setTime(date.getTime() + cookieExpiration)
+    document.cookie = 'authId=' + authId + '; expires=' + date.toUTCString()
+    console.log('setUserAuth > identification ok, authId:' + authId + ' cookie:' + document.cookie)
   }
   else {
     // delete cookies
-    document.cookie = 'authId=; expires=Thu, 01-Jan-70 00:00:01 GMT';
-    console.info('setUserAuth > logout');
+    document.cookie = 'authId=; expires=Thu, 01-Jan-70 00:00:01 GMT'
+    console.info('setUserAuth > logout')
   }
 }
 
 function getUserSessionId(): string | false {
   if (document.cookie) {
-    var res = document.cookie.match(/authId=(\w+)/);
+    let res = document.cookie.match(/authId=(\w+)/)
     if (res != null && res.length == 2)
-      return res[1];
+      return res[1]
   }
-  return false;
+  return false
 }
 
 function redirect(href: string, reason: ToStringId, confirmRedirection = false) {
 
   if (confirmRedirection) {
     if (confirm(i18n.gyrus.x_messages[reason])) {
-      document.location.href = href;
+      document.location.href = href
     }
   } else {
     if (reason) {
       if (i18n.gyrus.x_messages[reason]) {
-        alert(i18n.gyrus.x_messages[reason]);
+        alert(i18n.gyrus.x_messages[reason])
       }
       else {
-        alert('Error code ' + reason);
+        alert('Error code ' + reason)
       }
     }
-    document.location.href = href;
+    document.location.href = href
   }
 }
 
@@ -53,10 +53,10 @@ interface Recaptcha {
   reset: (opt_widget_id?: captchaWidget) => void,
 }
 
-declare var grecaptcha: Recaptcha;
-var widgetCaptcha: captchaWidget;
+declare let grecaptcha: Recaptcha;
+let widgetCaptcha: captchaWidget;
 
-var loadCaptachaScript = function (src: string) {
+let loadCaptachaScript = function (src: string) {
   console.log('loading captcha script');
   let captchaScript = document.createElement('script');
   captchaScript.type = 'text/javascript';
@@ -71,13 +71,13 @@ var loadCaptachaScript = function (src: string) {
   else { console.error('no parentNode') }
 }
 
-var captchaCallback = function (response: string) {
+let captchaCallback = function (response: string) {
   console.log(response);
-  var btn = <HTMLButtonElement>(document.getElementById('signin_button'));
+  let btn = <HTMLButtonElement>(document.getElementById('signin_button'));
   btn.disabled = false;
 }
 
-var onloadCallback = function () {
+let onloadCallback = function () {
   widgetCaptcha = grecaptcha.render('divcaptcha', {
     sitekey: '6Lch0v4SAAAAAF9EtTI6Kb40Rvll5TnF4i-wFSjW',
     callback: captchaCallback
@@ -85,7 +85,7 @@ var onloadCallback = function () {
 };
 
 // XUserSessionAck ~ XRegistrationAck, XLoginAck, XCheckSessionAck, XCloseSessionAck
-var XUserSessionAck: (this: XMLHttpRequest, ev: Event) => any = function (this: XMLHttpRequest, _ev: Event): any {
+let XUserSessionAck: (this: XMLHttpRequest, ev: Event) => any = function (this: XMLHttpRequest, _ev: Event): any {
 
   console.log('XUserSessionAck >');
   console.log(this.responseText);
@@ -122,7 +122,7 @@ var XUserSessionAck: (this: XMLHttpRequest, ev: Event) => any = function (this: 
   XShowError(i18n.gyrus.x_messages[(<ErrorMessage>response).toStringId]);
 }
 
-var XSubmitRegistration = function (form: HTMLFormElement) {
+let XSubmitRegistration = function (form: HTMLFormElement) {
 
   // TODO (0) : enable/disable captcha, password and code from server configuration
   // TODO (0) : enable/disable password/mail from server configuration
@@ -138,7 +138,7 @@ var XSubmitRegistration = function (form: HTMLFormElement) {
   xReq.onload = XUserSessionAck;
   xReq.onerror = function (e) {
     console.error(e);
-    XShowError(e.message);
+    XShowError(e.toString())
     /* console.error(e);
      (<HTMLDivElement>document.getElementById('error_display')).style.visibility = 'visible'; // show error message
      (<HTMLFormElement>document.getElementById('login_form')).style.visibility = 'visible'; */
@@ -164,7 +164,7 @@ var XSubmitRegistration = function (form: HTMLFormElement) {
   xReq.send();
 }
 
-var XSubmitLogin = function (form: HTMLFormElement) {
+let XSubmitLogin = function (form: HTMLFormElement) {
 
   XClearError();
   form.style.visibility = 'hidden'; // hide form // TODO (5) : show back timeout
@@ -173,7 +173,7 @@ var XSubmitLogin = function (form: HTMLFormElement) {
   xReq.onload = XUserSessionAck;
   xReq.onerror = function (e) {
     console.error(e);
-    XShowError(e.message);
+    XShowError(e.toString());
   }
 
   let loginInput: HTMLInputElement = <HTMLInputElement>document.getElementById('input_login');
@@ -192,7 +192,7 @@ var XSubmitLogin = function (form: HTMLFormElement) {
 console.log('declare XCheckSession')
 // index.html onload 
 // TODO (0) CORS
-var XCheckSession = function (form: HTMLFormElement) {
+let XCheckSession = function (form: HTMLFormElement) {
 
   let sessionId = getUserSessionId();
 
@@ -206,7 +206,7 @@ var XCheckSession = function (form: HTMLFormElement) {
     xReq.onload = XUserSessionAck;
     xReq.onerror = function (e) {
       console.error(e);
-      XShowError(e.message);
+      XShowError(e.toString());
       setUserSession(false);
     }
 
@@ -221,7 +221,7 @@ var XCheckSession = function (form: HTMLFormElement) {
   }
 }
 
-var XShowSuccess = function (username?: string) {
+let XShowSuccess = function (username?: string) {
   console.log('XShowSuccess > ' + username);
   if (username) {
     (<HTMLDivElement>document.getElementById('user_name')).textContent = username;
@@ -229,7 +229,7 @@ var XShowSuccess = function (username?: string) {
   (<HTMLDivElement>document.getElementById('success_display')).style.visibility = 'visible'; // show success message
 }
 
-var XShowError = function (message = i18n.gyrus.x_messages[ToStringId.ServerError]) {
+let XShowError = function (message = i18n.gyrus.x_messages[ToStringId.ServerError]) {
   console.log('XShowError > ' + message);
   let dispErr = <HTMLDivElement>document.getElementById('error_display');
   dispErr.textContent = message;
@@ -240,14 +240,14 @@ var XShowError = function (message = i18n.gyrus.x_messages[ToStringId.ServerErro
   }
 }
 
-var XClearError = function () {
+let XClearError = function () {
   console.log('XClearError > ');
   let dispErr = <HTMLDivElement>document.getElementById('error_display');
   dispErr.textContent = '';
   dispErr.style.visibility = 'hidden';
 }
 
-var XCloseSession = function () {
+let XCloseSession = function () {
 
   let sessionId = getUserSessionId();
 
@@ -261,7 +261,7 @@ var XCloseSession = function () {
     xReq.onload = XUserSessionAck;
     xReq.onerror = function (e) {
       console.error(e);
-      XShowError(e.message);
+      XShowError(e.toString());
       setUserSession(false);
     }
 
@@ -281,7 +281,7 @@ var XCloseSession = function () {
 
 // registration.html onload
 // TODO (0) CORS
-var xConfigureRegistration = function (_form: HTMLFormElement) {
+let xConfigureRegistration = function (_form: HTMLFormElement) {
 
   let sessionId = getUserSessionId();
 
@@ -301,7 +301,7 @@ var xConfigureRegistration = function (_form: HTMLFormElement) {
     xReq.onload = xConfigureRegistrationAck;
     xReq.onerror = function (e) {
       console.error(e);
-      XShowError(e.message);
+      XShowError(e.toString());
     }
 
     let data: XConfigureRegistrationRequest = {
@@ -314,7 +314,7 @@ var xConfigureRegistration = function (_form: HTMLFormElement) {
 }
 
 
-var xConfigureRegistrationAck: (this: XMLHttpRequest, ev: Event) => any = function (this: XMLHttpRequest, _ev: Event): any {
+let xConfigureRegistrationAck: (this: XMLHttpRequest, ev: Event) => any = function (this: XMLHttpRequest, _ev: Event): any {
 
   console.log('xConfigureRegistrationAck >');
   console.log(this.responseText);

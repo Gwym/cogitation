@@ -1,13 +1,15 @@
+// FIXME (0) : not shared, setImmediate only exists for node, not browser
+
 // States EventS Actions Machines
 
 import { dbg } from "../logger" // FIXME (0) : dbg => console in shared gen
 
 type Events = number   // ~ enum Events { }
-type States =  number  // ~ enum States { Init }
+type States = number  // ~ enum States { Init }
 
 export interface SesamEvent {
     evt: Events
-    data?: any 
+    data?: any
 }
 
 export interface EventsTable {
@@ -26,32 +28,31 @@ export interface MachineInterface {
     clearScheduledEvent(e: SesamEvent): void
 }
 
-
 export abstract class Sesam implements MachineInterface {
 
     protected eventQueue: SesamEvent[] = []
     protected timers: NodeJS.Timer[] = []
 
-    protected _state: States  = 0
+    protected _state: States = 0
     //  get state() { return this._state
-    
+
     protected init(initStateId: States) {
 
         let initState = this.stateTable[initStateId]
         if (initState === undefined) {
             // TODO (1) : dispatcher event ?
-            throw('Unknown Init State')
+            throw ('Unknown Init State')
         }
 
         this._state = initStateId
         if (initState.entry) {
-            initState.entry()  
+            initState.entry()
         }
     }
 
     transition(newStateId: States, trigger: SesamEvent) {
 
-        dbg.log('transition from ' + this._state + ' to ' + newStateId )
+        dbg.log('transition from ' + this._state + ' to ' + newStateId)
 
         let newState = this.stateTable[newStateId]
         if (newState === undefined) {
@@ -63,14 +64,14 @@ export abstract class Sesam implements MachineInterface {
         if (this._state !== newStateId) {
 
             // dbg.log('set state ' + this._state + ' >> ' + new_state)
-            let currentState = this.stateTable[this._state] 
+            let currentState = this.stateTable[this._state]
             if (currentState.exit) {
                 currentState.exit(trigger)
             }
-     
+
             this._state = newStateId
             if (newState.entry) {
-                newState.entry(trigger)  
+                newState.entry(trigger)
             }
             // this.dispatcher({ target: this.id, messageType: MessageTypes.State, data: { state: new_state } })
         }
@@ -117,11 +118,11 @@ export abstract class Sesam implements MachineInterface {
         }
     }
 
-    protected ignore(e: SesamEvent) { 
+    protected ignore(e: SesamEvent) {
         dbg.log('{ machine: ' + this.toString() + ' state: ' + this._state + ' event:' + e + ' action: ignore')
     }
 
-    protected defer(e: SesamEvent) { 
+    protected defer(e: SesamEvent) {
         dbg.log('{ machine: ' + this.toString() + ' state: ' + this._state + ' event:' + e + ' action: defer')
         // TODO (1) : deffered events queue, conservation condition and expiry date
     }
@@ -133,11 +134,11 @@ export abstract class Sesam implements MachineInterface {
             throw new Error(' timer already set')
         }
         dbg.log('scheduleEvent ' + e.evt + ' in ' + delayMs + ' ms ')
-        this.timers[e.evt] = setTimeout(() => { 
+        this.timers[e.evt] = setTimeout(() => {
             dbg.log('scheduledEvent' + e.evt)
-            delete this.timers[e.evt] 
+            delete this.timers[e.evt]
             this.event(e)
-         }, delayMs)
+        }, delayMs)
     }
 
     clearScheduledEvent(e: SesamEvent) {
@@ -145,7 +146,7 @@ export abstract class Sesam implements MachineInterface {
         if (this.timers[e.evt] !== undefined) {
             clearTimeout(this.timers[e.evt])
             delete this.timers[e.evt]
-            dbg.log('clearScheduledEvent (' + e + ')'  + ' ' + this.timers)
+            dbg.log('clearScheduledEvent (' + e + ')' + ' ' + this.timers)
         }
         else {
             dbg.error({ error: 'UNKNOWN_TIMER', event: e })

@@ -20,6 +20,6 @@ build
 epigen/gen_shared_frontend.js
 epigen/run_tests.js
 frontend/epigen/src/shared.gen.ts
-frontend/js/client.js
+frontend/js
 frontend/sandbox
 tmp

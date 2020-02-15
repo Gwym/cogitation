@@ -30,3 +30,18 @@ class BasePointer implements PointerInterface {
     }
 
 }
+
+class Pointer2D extends BasePointer {
+
+
+    // TODO (2) : for compatibility with THREE trackballcontrol
+    screen = {
+        width: 0,
+        height: 0
+    }
+
+    update() {
+        // console.log('Pointer2D update')
+    }
+
+}

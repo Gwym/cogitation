@@ -1,8 +1,4 @@
 
-
-
-
-
 // class Engine : World representation
 class SulcusClientEngine {
 
@@ -36,12 +32,7 @@ class SulcusClientEngine {
 
     constructor(eventTarget: EventTarget, protected ui: SulcusUi) {
 
-
-
-
         this.pointer = new BasePointer(eventTarget, this);
-
-
 
         window.addEventListener('resize', () => { this.onWindowResize(); });
 
@@ -119,3 +110,4 @@ class SulcusClientEngine {
 
     }
 }
+

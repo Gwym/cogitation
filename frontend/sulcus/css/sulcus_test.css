@@ -1,0 +1,129 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    background-color: #252526;
+    color: white;
+    font-family: Monospace;
+    min-height: 100%;
+}
+
+.deck {
+    position: absolute;
+    margin: 2em;
+    padding: 2em;
+    border: 1px solid silver;
+    width: 100%;
+    min-height: 20em;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.deck > div {
+    border: 1px solid white;
+    background-color: #444;
+
+    flex: 0 0 auto;
+    width: 25%;
+}
+
+canvas {
+    position: absolute;
+    z-index: 1;
+    top: 0px;
+    border: none;
+}
+
+p {
+    margin-left: 1em;
+    border: none;
+    color: #73c991;
+}
+
+[role="alert"] {
+    font-size: bold;
+    color: red;
+}
+
+
+.ui_container {
+    position: absolute;
+    z-index: 2;
+    width: 100%;
+    top: 0px;
+    right: 0px;
+    background-color: rgba(0, 0, 255, 0.5);
+}
+
+.shortcut_key {
+
+    background-color: blueviolet;
+    border: 1px solid violet;
+    margin-left: 1em;
+    width: 3em;
+    display: inline-block;
+    text-align: center;
+    cursor: pointer; 
+}
+
+
+.symbolic_expression {
+    display: block;
+    border: 1px solid rgb(196, 196, 15);
+    background-color: rgb(71, 71, 16);
+    padding: 2px 2px;
+}
+
+.symbolic_expression p {
+    display: inline-block;
+    border: 1px solid orange;
+    background-color: rgb(61, 24, 24);
+    padding: 2px 2px;
+}
+
+.css_symbolic_base_quantity {
+    display: block;
+    border: 1px solid rgb(123, 133, 153);
+    background-color: rgb(38, 40, 43);
+    padding: 2px 2px;
+}
+
+.css_symbolic_base_quantity p {
+    display: inline-block;
+    border: 1px solid gold;
+    background-color: rgb(61, 24, 24);
+    padding: 2px 2px;
+}
+
+.symbolic_base_quantity_expression {
+    display: inline-block;
+    border: 1px solid fuchsia;
+    background-color: rgb(68, 11, 11);
+    padding: 2px 2px;
+}
+
+.symbolic_base_unit {
+    display: inline-block;
+    border: 1px solid violet;
+    background-color: purple;
+    padding: 2px 2px;
+}
+
+.symbolic_base_ref {
+    display: inline-block;
+    border: 1px solid grey;
+    background-color: darkolivegreen;
+    padding: 2px 2px;
+}
+
+
+
+

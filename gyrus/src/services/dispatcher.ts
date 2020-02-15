@@ -85,7 +85,7 @@ export class UserSession implements UserSessionInterface {
 
 export class GuestUserSession extends UserSession {
   constructor() {
-      super({ name: 'Guest' })
+    super({ name: 'Guest' })
   }
 }
 
@@ -147,7 +147,7 @@ export interface WebsocketMessage {
 
 
 export interface DispatcherInterface {
- // (arg: WebsocketMessage): void;
+  // (arg: WebsocketMessage): void;
 }
 
 export abstract class Dispatcher implements UserSessionSyncManager, DispatcherInterface {
@@ -165,7 +165,8 @@ export abstract class Dispatcher implements UserSessionSyncManager, DispatcherIn
   // readonly fileServerPath?: string
   // readonly fileServerOptions?: any
   // readonly XJsonUrl?: string
-  abstract dispatchWsCommand(cmd: c2s_ChannelMessage, user: UserSessionInterface): void;
+  abstract dispatchWsCommand(cmd: c2s_ChannelMessage, user: UserSessionInterface): void
+  abstract dispatchBinary(cmd: Buffer | ArrayBuffer | Buffer[], user: UserSessionInterface): void;
   abstract createSession(userOptions: UserOptions): UserSessionInterface
 
   // WARNING : switching database is only for integration testing, engine cannot manage db change
@@ -294,7 +295,7 @@ export abstract class Dispatcher implements UserSessionSyncManager, DispatcherIn
 
     // TODO (2) : nodeObserver
 
-    wss.on('connection', (ws) => {
+    wss.on('connection', (ws: wsWebSocket) => {
 
       //let user: UserWrapper; // Hex ObjectId of the user owner of this session
 
@@ -304,7 +305,12 @@ export abstract class Dispatcher implements UserSessionSyncManager, DispatcherIn
         return;
       }
 
-      dbg.log('ws.onconnection > clients ' + wss.clients.size, LoggerParts.Filename);
+      if (wss.clients) {
+        dbg.log('ws.onconnection > clients ' + wss.clients.size, LoggerParts.Filename);
+      }
+      else {
+        dbg.warn('ws.onconnection > clients manager not enabled in wss');
+      }
 
       ws.on('error', (e) => {
         dbg.log('WS ERROR' + e);
@@ -333,31 +339,36 @@ export abstract class Dispatcher implements UserSessionSyncManager, DispatcherIn
 
         let wsu: UserSessionInterface = candidateWsu;
 
-        ws.on('message', (message: string) => {
+        ws.on('message', (message: wsWebSocket.Data) => {
 
-          try {
-            let c2s_m: c2s_ChannelMessage = JSON.parse(message);
-            dbg.log('ws.onmessage > ' + message);
-            // dispatch(user[ws.userID]) or ws.dispatch( ?=)
-            this.dispatchWsCommand(c2s_m, wsu);
+          if (typeof message === 'string') {
+            try {
+              let c2s_m: c2s_ChannelMessage = JSON.parse(message)
+              dbg.log('ws.onmessage > ' + message)
+              // dispatch(user[ws.userID]) or ws.dispatch( ?=)
+              this.dispatchWsCommand(c2s_m, wsu)
+            }
+            catch (e) {
+              dbg.log('ws.onmessage > Error ' + e + ', closing ' + dbg.toStr(ws))
+              // this.destroyWsSession(wsu.iId);
+              ws.close()
+            }
           }
-          catch (e) {
-            dbg.log('ws.onmessage > Error ' + e + ', closing ' + dbg.toStr(ws));
-            // this.destroyWsSession(wsu.iId);
-            ws.close();
+          else {
+            this.dispatchBinary(message, wsu)
           }
-        });
+        })
 
-        dbg.log('User  ' + wsu.userOptions.name + ' connected, sending UserGist');
-        let ackUser: UserSessionAck = { type: MessageType.User, userOptions: wsu.userOptions };
+        dbg.log('User  ' + wsu.userOptions.name + ' connected, sending UserGist')
+        let ackUser: UserSessionAck = { type: MessageType.User, userOptions: wsu.userOptions }
 
         ws.send(JSON.stringify(ackUser), (err) => {
           if (err) {
-            dbg.log('ws.once > ws.send err:' + err);
+            dbg.log('ws.once > ws.send err:' + err)
           }
-        });
-        dbg.log('sent  ' + JSON.stringify(ackUser));
-      }); // auth once
+        })
+        dbg.log('sent  ' + JSON.stringify(ackUser))
+      }) // auth once
       // #ENDIFDEF MEMORY_SESSIONS
 
       /* #IFDEF PERSISTOR_SESSIONS
@@ -442,28 +453,28 @@ export abstract class Dispatcher implements UserSessionSyncManager, DispatcherIn
     let userSession = this.userSessions[sessionId]
 
     if (userSession === undefined) {
-        console.log('connect guest session')
-        userSession = new GuestUserSession()
+      console.log('connect guest session')
+      userSession = new GuestUserSession()
     }
 
     userSession.connectWs(ws)
 
     return userSession
-}
+  }
 
-/*
-  connectSession(ws: wsWebSocket, sessionId: string): UserSessionInterface | undefined {
-
-    let userSession = this.userSessions[sessionId];
-
-    if (userSession === undefined) {
-      return; // throw ErrMsg.SessionError;
-    }
-
-    userSession.connectWs(ws);
-
-    return userSession;
-  } */
+  /*
+    connectSession(ws: wsWebSocket, sessionId: string): UserSessionInterface | undefined {
+  
+      let userSession = this.userSessions[sessionId];
+  
+      if (userSession === undefined) {
+        return; // throw ErrMsg.SessionError;
+      }
+  
+      userSession.connectWs(ws);
+  
+      return userSession;
+    } */
 
   /* disconnectWsSession(sessionId: string): void {
  
@@ -622,13 +633,13 @@ interface captchaResponse {
 class RegistrationSequence {
 
   // TODO (2) : config from UserManager ?
-  configuration: ConfigurationInterface 
+  configuration: ConfigurationInterface
 
   constructor(protected userManager: UserAsyncManager, protected captchaSecret: string, config: ConfigurationInterface) {
 
-      this.configuration = config
+    this.configuration = config
 
-   }
+  }
 
   /* async registration(cmd: XRegistrationRequest, callback: (ack: UserSessionAck) => void) {
  
@@ -787,7 +798,7 @@ class RegistrationSequence {
           resolve();
         }
         else {
-          dbg.info('checkPasswordStrength > invalid code'); 
+          dbg.info('checkPasswordStrength > invalid code');
           reject(ErrMsg.WeakPassword);
         }
       }

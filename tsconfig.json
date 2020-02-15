@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     /* Basic Options */
-    "target": "es6",                          /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', or 'ESNEXT'. */
+    "target": "es2017",                          /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', or 'ESNEXT'. */
     "module": "commonjs",                     /* Specify module code generation: 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
     // "lib": [],                             /* Specify library files to be included in the compilation:  */
     // "allowJs": true,                       /* Allow javascript files to be compiled. */
@@ -59,11 +59,13 @@
     "gyrus/src/services/static_server.ts",
     "gyrus/src/services/persistor.ts",
     "gyrus/src/base/engine.ts",
+    "gyrus/src/base/nodb.ts",
     "gyrus/src/base/mongodb.ts",
     "gyrus/src/base/admin.ts",
 
     "sulcus/src/shared/messaging.ts",
     "sulcus/src/sulcus_engine.ts",
+    "sulcus/src/system_operator.ts",
 
     // "abyme/src/shared/messaging.ts",
     // "abyme/src/operator.ts",
