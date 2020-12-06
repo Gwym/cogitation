@@ -1,4 +1,113 @@
 
+// https://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2
+function isPowerOfTwo(n: number) {
+
+  // return n && (n & (n - 1)) === 0
+  return n && !(n & (n - 1)) // 0 excluded
+}
+
+class SignalBase {
+
+  // origin = 0
+  // unit = 1
+  // TODO (1) : accessor, check existance
+  data: Float32Array[] = []
+
+  get dimensionCount(): Integer { return this.data.length }
+  get elementCount(): Integer { return this.data[0].length }
+
+  constructor(settings: { elementCount: Integer, dimensionCount: Integer }) {
+
+    if (settings.dimensionCount <= 0 || settings.dimensionCount > 10) {
+      throw 'Allowed dimensionCount from 1 to 10, given: ' + settings.dimensionCount
+    }
+
+    if (settings.elementCount <= 1 || settings.elementCount > 2048 || (!isPowerOfTwo(settings.elementCount))) {
+      throw 'Allowed elementCount power of two from 2 to 2048, given: ' + settings.elementCount
+    }
+
+    for (let d = 0; d < settings.dimensionCount; d++) {
+      this.data[d] = new Float32Array(settings.elementCount)
+    }
+  }
+}
+
+class InitSignal {
+
+  static ramp(mesh: Float32Array | Float64Array,
+    options: { scaleX?: number, scaleY: number, offsetX?: number, offsetY: number }) {
+
+    let l = mesh.length
+
+    let incrementY = options.scaleY / l
+
+    // TODO (1) : offsetX and scaleX
+
+    for (let i = 0; i < l; i++) {
+      mesh[i] = options.offsetY + (i * incrementY)
+    }
+  }
+
+  static rampModulo(mesh: Float32Array | Float64Array,
+    options: { increment: number, scaleX?: number, scaleY?: number, offsetX: number, offsetY: number, modulo: number }) {
+
+    let l = mesh.length
+
+    for (let i = 0; i < l; i++) {
+      mesh[i] = options.offsetY + ((options.offsetX + i * options.increment)) % options.modulo
+    }
+  }
+
+  static constant(mesh: Float32Array | Float64Array,
+    options: { from?: number, upTo?: number, value: number }) {
+
+    if (options.from === undefined) {
+      options.from = 0
+    }
+    if (options.upTo === undefined) {
+      options.upTo = mesh.length
+    }
+
+    console.log('linear ramp x_i:' + options.from + ' x_f:' + options.upTo + ' ' + options.value )
+
+    for (let x = options.from; x < options.upTo; x++) {
+      mesh[x] = options.value
+    }
+  }
+
+  static linearRamp(mesh: Float32Array | Float64Array,
+    options: { fromX?: number, upToX?: number, initialValue: number, finalValue: number }) {
+
+
+    let x_i = options.fromX === undefined ? 0 : options.fromX
+    let x_f = options.upToX === undefined ? mesh.length - 1 : options.upToX - 1
+
+    console.log('linear ramp x_i:' + x_i + ' x_f:' + x_f + ' ' + options.initialValue + ' ' + options.finalValue)
+
+    let extentX = x_f - x_i
+    let extentY = options.finalValue - options.initialValue
+    let slope = extentY / extentX
+    // let divisor = (slope * options.fromX)
+    let initialOrdinate: number = 0
+   /* if (divisor === 0) {
+      initialOrdinate = 0
+    }
+    else {
+      initialOrdinate = options.initialValue / divisor
+    } */
+    if (extentX !== 0) {
+      initialOrdinate = (options.initialValue * x_f - options.finalValue * x_i)/extentX
+    }
+    
+
+    for (let x = x_i; x <= x_f ; x++) {
+      mesh[x] = initialOrdinate + slope * x
+    }
+  }
+
+}
+
+
 class Signal {
 
   t_0 = 0
@@ -6,7 +115,7 @@ class Signal {
   length = 0
   r: Float32Array   // real part (polar: false) or modulus (polar: true)
   i: Float32Array   // imaginary part (polar: false) or phase (polar: true)
-  polar = false
+  polar = false // phasor or vector (translator)
 
   constructor(len: number);
   constructor(data: Float32Array);
@@ -38,6 +147,17 @@ class Signal {
     }
   }
 
+  ramp(offset: number) {
+
+    this.t_0 = -this.length / 2
+
+    offset = offset === undefined ? this.length / 2 : offset
+    for (let i = -5; i < 6; i++) {
+      this.r[offset + i] = Math.sign(i)
+      //signal.i[offset] = 0
+    }
+  }
+
   square(offset: number) {
 
     this.t_0 = -this.length / 2
@@ -48,6 +168,7 @@ class Signal {
       //signal.i[offset] = 0
     }
   }
+
   dirac(offset: number) {
 
     this.t_0 = -this.length / 2
@@ -56,6 +177,7 @@ class Signal {
     this.r[offset] = 1;
     //signal.i[offset] = -1;
   }
+
   sin(period = 1, average = 0, phase = 0) {
 
     this.t_0 = - period * Math.PI
@@ -65,19 +187,21 @@ class Signal {
       this.r[i] = Math.sin(this.get_t(i) + phase) + average
     }
   }
+
   sin_f(frequency = 1, average = 0, phase = 0) {
 
     let bufferDuration = 4.5 // seconds
     let periodPerBuffer = frequency * bufferDuration
 
-   // this.x0 = - periodPerBuffer * Math.PI // * 2 PI / 2
-   this.t_0 = 0
+    // this.x0 = - periodPerBuffer * Math.PI // * 2 PI / 2
+    this.t_0 = 0
     this.t_delta = periodPerBuffer * 2 * Math.PI / this.length
 
     for (let i = 0; i < this.length; i++) {
       this.r[i] = Math.sin(this.get_t(i) + phase) + average
     }
   }
+
   gaussian() {
 
     let scale = 5;
@@ -92,6 +216,7 @@ class Signal {
       this.i[i] = 0; // -Math.exp(-x*x);
     }
   }
+
   gaussianPulse(phase: number) {
 
     phase = phase === undefined ? 0 : phase;
@@ -112,6 +237,7 @@ class Signal {
       this.i[i] = 0; // -Math.exp(-x*x);
     }
   }
+
   noise() {
 
     this.t_0 = -this.length / 2
@@ -120,6 +246,7 @@ class Signal {
       this.r[i] = Math.random() * 2.0 - 1.0
     }
   }
+
   exp_i(period = 1, average = 0, phase = 0) {
 
     this.t_0 = - period * Math.PI
@@ -130,6 +257,7 @@ class Signal {
       this.i[i] = Math.sin(this.get_t(i) + phase) + average
     }
   }
+
   dualTone(ratio = 3) {
 
     this.t_0 = - 20 * Math.PI
@@ -139,8 +267,6 @@ class Signal {
       this.r[i] = Math.sin(this.get_t(i)) + Math.sin(this.get_t(i) / ratio) + (Math.random() - 0.5)
     }
   }
-
-
 
   getBounds() {
 
@@ -235,7 +361,7 @@ let fft = function (re: Float32Array, im: Float32Array, inverse = false) {
 
   let len = re.length
   let Pi = Math.PI,
-      i, j, k, L, m, Le, Le1,
+    i, j, k, L, m, Le, Le1,
     Tr, Ti, Ur, Ui, Xr, Xi, Wr, Wi, Ip;
 
   function isPwrOf2(n: number) {
@@ -267,12 +393,12 @@ let fft = function (re: Float32Array, im: Float32Array, inverse = false) {
   for (i = 0; i < lenM1; i++) {
     if (i < j) {
 
-     /* Tr = Ar[j]
-      Ti = Ai[j]
-      Ar[j] = Ar[i]
-      Ai[j] = Ai[i]
-      Ar[i] = Tr
-      Ai[i] = Ti */
+      /* Tr = Ar[j]
+       Ti = Ai[j]
+       Ar[j] = Ar[i]
+       Ai[j] = Ai[i]
+       Ar[i] = Tr
+       Ai[i] = Ti */
       [re[i], re[j]] = [re[j], re[i]];
       [im[i], im[j]] = [im[j], im[i]]
     }

@@ -3,6 +3,7 @@
 // TODO (2) : no auto load, convert to loadable Experiement
 // window.addEventListener('load', startSignal)
 
+
 function startSignal() {
 
   console.log('Signal > loading')
@@ -14,7 +15,7 @@ function startSignal() {
   }
 
   for (var i = 0; i < canvas.length; i++) {
-    contexts[i] = <CanvasRenderingContext2D>canvas[i].getContext("2d");
+    contexts[i] = <CanvasRenderingContext2D>canvas[i].getContext("2d")
   }
 
   console.log('sulcus - signal contexts: ' + contexts.length)

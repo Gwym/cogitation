@@ -5,6 +5,8 @@ interface LinearPlotDesign {
   strokeStyleAxes?: string | false
   strokeStyleReMarker?: string | false
   strokeStyleImMarker?: string | false
+  strokeStyleReCurrentMarker?: string | false
+  strokeStyleImCurrentMarker?: string | false
   scaleX?: number
   scaleY?: number
   x0?: number
@@ -17,13 +19,15 @@ class LinearPlot2D implements LinearPlotDesign {
   strokeStyleIm: string | false = 'rgb(255,127,127)'
   strokeStyleReMarker: string | false = 'rgba(0,172,0, 0.5)'
   strokeStyleImMarker: string | false = 'rgba(255,127,127, 0.5)'
+  strokeStyleReCurrentMarker: string | false = 'rgb(255,0,0)'
+  strokeStyleImCurrentMarker: string | false = 'rgb(0,255,0)'
   strokeStyleAxes: string | false = 'rgb(128,128,128)'
   scaleX: number
   scaleY: number
   x0: number
   y0: number
 
-  constructor(signal: Signal, context: CanvasRenderingContext2D, design: LinearPlotDesign = {}) {
+  constructor(signal: Signal, context: CanvasRenderingContext2D, design: LinearPlotDesign = {}, currentMarkerIndex?: number) {
 
     let bounds = signal.getBounds()
 
@@ -84,6 +88,12 @@ class LinearPlot2D implements LinearPlotDesign {
       for (let i = 0; i < signal.length; i++) {
         context.strokeRect(signal.get_t(i) * this.scaleX + this.x0 - 1, this.y0 - signal.r[i] * this.scaleY - 1, 3, 3)
       }
+    }
+
+    if (currentMarkerIndex !== undefined && this.strokeStyleReCurrentMarker) {
+
+      context.fillStyle = this.strokeStyleReCurrentMarker
+      context.fillRect(signal.get_t(currentMarkerIndex) * this.scaleX + this.x0 - 1, this.y0 - signal.r[currentMarkerIndex] * this.scaleY - 1, 3, 3)
     }
 
     if (this.strokeStyleImMarker) {

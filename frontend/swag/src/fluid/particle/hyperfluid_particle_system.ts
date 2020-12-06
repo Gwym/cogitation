@@ -4,7 +4,7 @@ class HyperFluidParticleSystem extends ParticleSystemBase {
     private particles: HyperVorton[] = []
 
 
-    private timeStep = 1
+    private timeStep = .1
 
     private xCellCount = 4
     private yCellCount = 4
@@ -291,4 +291,74 @@ class HyperVorton extends FIVE.Object5D implements PhysicalEntity {
         console.assert(mass >= 0)
         return mass
     }
+}
+
+ type Ingrédients  = number
+
+// class Ingrédients {}
+
+class IngrédientCruPur {
+
+}
+
+class IngrédientCuitPur {
+
+}
+
+class IngrédientsCrusMélangés {
+
+}
+
+class IngrédientsCuitsMélangés {
+
+}
+
+class IngrédientsMélangés {
+
+}
+
+
+class CuissonMélange {
+
+    // ingrédients: Ingrédients = 0
+
+    cuire(ingrédients: Ingrédients){
+        return ingrédients
+    }
+
+    mélanger(ingrédients: Ingrédients) {
+        return ingrédients
+    }
+
+    cuirePuisMélanger(ingrédients: Ingrédients): Ingrédients {
+        return this.mélanger(this.cuire(ingrédients))
+    }
+
+    mélangerPuisCuire(ingrédients: Ingrédients): Ingrédients {
+        return this.cuire(this.mélanger(ingrédients))
+    }
+
+    commutateur(ingrédients: Ingrédients): Ingrédients {
+        return this.cuirePuisMélanger(ingrédients) - this.mélangerPuisCuire(ingrédients)
+    }
+}
+
+class Mammifère {
+
+}
+
+class Carnivore {
+
+}
+
+class Chat implements Mammifère, Carnivore {
+
+    longeurDuMuseau: number = 1
+    longeurDesOreilles: number = 1
+}
+
+class Chien implements Mammifère, Carnivore {
+
+    longeurDuMuseau: number = 2
+    longeurDesOreilles: number = 2
 }

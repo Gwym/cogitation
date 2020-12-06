@@ -1,0 +1,37 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+    background: black;
+    color: white;
+    font-family: sans-serif;
+}
+
+
+.deck {
+    margin: 2em;
+    padding: 2em;
+    border: 1px solid silver;
+    min-height: 20em;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.deck > div {
+    border: 1px solid white;
+    background-color: #444;
+
+    flex: 0 0 auto;
+    width: 25%;
+}
+
+canvas {
+    top: 0px;
+    position: absolute;
+}
+
+
