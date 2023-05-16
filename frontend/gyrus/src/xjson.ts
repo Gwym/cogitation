@@ -155,7 +155,7 @@ let XSubmitRegistration = function (form: HTMLFormElement) {
     name: nameInput.value,
     mail: mailInput.value,
     password: passwordInput.value,
-    date: dateInput.valueAsDate,
+    date: dateInput.valueAsDate || new Date(),
     captchaResponse: cResponse,
     invitationCode: invitationCode.value
   };

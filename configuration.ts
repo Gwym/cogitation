@@ -26,7 +26,7 @@ try {
 
 }
 catch (e) {  // file not found, parse error, ... => set default
-  dbg.warn(e)
+  dbg.warn(<string>e)
   dbg.log('No or bad configuration, using defaults')
   configuration = {
 

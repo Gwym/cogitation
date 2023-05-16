@@ -98,19 +98,21 @@ export class AdminDispatcher {
             })
             .then((insertResults) => {
 
-                let count = 0
+               /*  let count = 0
 
-                for (let insertResult of insertResults) {
+                 for (let insertResult of insertResults) {
                     if (insertResult.result.ok !== 1) {
                         throw 'db.simu > insert failed ' + insertResult
                     }
                     else {
                         count += insertResult.insertedCount
                     }
-                }
+                } 
 
                 dbg.log('db.simu > Inserted ' + count)
+                */
 
+                dbg.log('db.simu > Inserted ' + insertResults.length)
 
                 return simulator.simulate(db)
             })

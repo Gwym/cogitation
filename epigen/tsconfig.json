@@ -52,6 +52,7 @@
   },
   "files": [
     "src/gen_shared_frontend.ts",
-    "src/run_tests.ts"
+    "src/run_tests.ts" 
+    //,"src/convert_js_to_ts.ts"
   ]
 }

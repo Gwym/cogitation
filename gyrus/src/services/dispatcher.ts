@@ -546,7 +546,14 @@ export abstract class Dispatcher implements UserSessionSyncManager, DispatcherIn
 
     }
     catch (e) {
-      dbg.error('dispatchXCommand > Parse error ' + e.message);
+
+      if (e instanceof Error) {
+        dbg.error('dispatchXCommand > Parse error ' + e.message );
+      } else {
+        dbg.error('dispatchXCommand > Error ' + e );
+      }
+
+      
       callback(ErrMsg.UnkownCommand);
     }
   }
@@ -697,7 +704,7 @@ class RegistrationSequence {
 
   private checkCaptcha(response: string) {
 
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
 
       if (this.configuration.doCheckCaptcha) {
 
@@ -759,7 +766,7 @@ class RegistrationSequence {
         resolve();
       }
     });
-  }
+  } 
 
   private checkCode(code: string): Promise<void> {
 

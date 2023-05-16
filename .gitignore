@@ -17,6 +17,8 @@ configuration.json
 
 # build
 build
+epigen/src/convert_js_to_ts.ts
+epigen/convert_js_to_ts.js
 epigen/gen_shared_frontend.js
 epigen/run_tests.js
 frontend/epigen/src/shared.gen.ts

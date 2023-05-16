@@ -72,6 +72,7 @@ class HyperFluidParticleSystem extends ParticleSystemBase {
     private doStep(dt: number, _stepLogger?: string[]) {
 
         for (let particle of this.particles) {
+            particle.rotateX(0.01)
             particle.position.addScalar(dt)
 
             // particle.updateVelocity()
@@ -146,13 +147,12 @@ class PlaneDistribution {
 
 
         console.log('Created: ' + pushCount + ' skipped: ' + skipCount)
-
-        if (this.particles.length) {
+        const COUNTLOG = 16
+        for (let i = 0 ; i < (COUNTLOG < this.particles.length? COUNTLOG: this.particles.length) ; i++) {
             console.log(
-                "vorton #0 r:" + Vec3.toStr(this.particles[0].position)
-                + " v: " + this.particles[0].velocity.toString()
-                + " #" + ((this.particles.length) - 1) + " r:" + Vec3.toStr(this.particles[this.particles.length - 1].position)
-                + " v: " + this.particles[this.particles.length - 1].velocity.toString()
+                "vorton #"+ i + " r:" + Vec3.toStr(this.particles[i].position) + " v: " + this.particles[i].velocity.toString()
+                // + " #" + ((this.particles.length) - 1) + " r:" + Vec3.toStr(this.particles[this.particles.length - 1].position)
+                // + " v: " + this.particles[this.particles.length - 1].velocity.toString()
             )
         }
     }
@@ -175,16 +175,14 @@ class PlaneDistribution {
 }
 
 
-
-
-class HyperVorton extends FIVE.Object5D implements PhysicalEntity {
+class HyperVorton extends THREE.Object3D {
 
     static DEFAULT_DRAW_RADIUS = 0.1 // 0.015 //0.01 //0.006
     static DEFAULT_PHYSICAL_RADIUS = 10
     static DEFAULT_PHYSICAL_VOLUME = 1
     static DEFAULT_PHYSICAL_MASS = 1
 
-    protected mesh: FIVE.Mesh
+    protected mesh: THREE.Mesh
     geometry: FIVE.SphereBufferGeometry
     material: THREE.MeshLambertMaterial
 
@@ -205,7 +203,7 @@ class HyperVorton extends FIVE.Object5D implements PhysicalEntity {
         this.geometry = new FIVE.SphereBufferGeometry(HyperVorton.DEFAULT_DRAW_RADIUS, 8, 4)
         this.material = new THREE.MeshLambertMaterial({ color: color })
 
-        this.mesh = new FIVE.Mesh(this.geometry, this.material)
+        this.mesh = new THREE.Mesh(this.geometry, this.material) // new FIVE.Mesh(this.geometry, this.material)
         this.add(this.mesh)
 
         if (position) {
@@ -237,6 +235,123 @@ class HyperVorton extends FIVE.Object5D implements PhysicalEntity {
         let length = this.velocity.length()
         if (length > 0.1) {
             this.velocityHelper = new FIVE.ArrowHelper(this.velocity.clone().normalize(), origin, length, color)
+            // semiMajorAxisArrow.rotateX(1)
+            this.add(this.velocityHelper)
+        }
+
+    }
+
+    updateVelocity() {
+
+        // FIXME (0) : create compulsory or create/delete on length change ?
+
+        /*   this.remove(this.velocityHelper)
+   
+           let length = this.velocity.length()
+           if (length > 0.1) {
+               this.velocityHelper = new FIVE.ArrowHelper(this.velocity.clone().normalize(), origin, length, color)
+               // semiMajorAxisArrow.rotateX(1)
+               this.add(this.velocityHelper)
+           }  */
+
+    }
+
+
+    density: Float = 1
+
+
+    // Get radius from size.
+    get radius(): Float {
+        return this.size * 0.5
+    }
+
+    // Set size from radius.
+    set radius(radius: Float) {
+        this.size = 2 * radius
+    }
+
+    /*    // Get vorticity from angular velocity.
+        get vorticity(): Vec3 {
+            return LA.multiplyScalar(this.angularVelocity, 2)
+        }
+    
+        // Assign vorticity as angular velocity.
+        set vorticity(vort: Vec3) {
+            this.angularVelocity = LA.multiplyScalar(vort, 0.5)
+        } */
+
+    get volume() {
+        return (Math.PI / 6) * this.size * this.size * this.size
+    }
+
+    get mass() {
+        let mass = this.density * this.volume
+        console.assert(mass >= 0)
+        return mass
+    }
+
+}
+
+class HyperVorton5D extends FIVE.Object5D implements PhysicalEntity {
+
+    static DEFAULT_DRAW_RADIUS = 0.1 // 0.015 //0.01 //0.006
+    static DEFAULT_PHYSICAL_RADIUS = 10
+    static DEFAULT_PHYSICAL_VOLUME = 1
+    static DEFAULT_PHYSICAL_MASS = 1
+
+    protected mesh: FIVE.Mesh
+    geometry: FIVE.SphereBufferGeometry
+    material: THREE.MeshLambertMaterial
+
+    public size: number // design mesh size
+    public acceleration: Vec3 = new Vec3(0, 0, 0)
+    public velocity: Vec3 = new Vec3(0, 0, 0)
+    private velocityHelper?: FIVE.ArrowHelper5D
+
+    constructor(
+        position?: Vec3,  // inherited from THREE.Object3D as default Vec(0,0,0)
+        velocity?: Vec3,
+        angularVelocity = new Vec3(0, 0, 0),
+        color = 0x4cb7a5
+    ) {
+        super()
+
+        this.size = HyperVorton5D.DEFAULT_PHYSICAL_RADIUS * 2
+        this.geometry = new FIVE.SphereBufferGeometry(HyperVorton5D.DEFAULT_DRAW_RADIUS, 8, 4)
+        this.material = new THREE.MeshLambertMaterial({ color: color })
+
+        this.mesh = new FIVE.Mesh(this.geometry, this.material)
+        this.add(this.mesh)
+
+        if (position) {
+            this.position.set(position.x, position.y, position.z)
+        }
+
+        if (velocity) {
+            this.velocity.set(velocity.x, velocity.y, velocity.z)
+        }
+
+        let l = angularVelocity.length()
+        if (l > 0) {
+
+            console.log(angularVelocity)
+            console.log(l)
+
+            let vorticityArrow = new FIVE.ArrowHelper5D(
+                angularVelocity.clone().normalize(),
+                new Vec3(0, 0, 0), // this.position, // new Vec3(0,0,0), // this.position,
+                l,
+                0x00ff00)
+            this.add(vorticityArrow)
+        }
+
+
+
+        let origin = new Vec3(0, 0, 0)
+
+        let length = this.velocity.length()
+        if (length > 0.1) {
+            this.velocityHelper = new FIVE.ArrowHelper5D(this.velocity.clone().normalize(), origin, length, color)
             // semiMajorAxisArrow.rotateX(1)
             this.add(this.velocityHelper)
         }

@@ -15,7 +15,67 @@ interface FluidModel extends PhysicalModel3D {
     _vorticity = new Vec3(0,0,0): ParticleBase
 )*/
 
-abstract class ParticleBase extends FIVE.Object5D implements PhysicalEntity {
+abstract class ParticleBase extends THREE.Object3D {
+
+    static DEFAULT_DRAW_RADIUS = 0.015 //0.01 //0.006
+    static DEFAULT_PHYSICAL_RADIUS = 1
+    static DEFAULT_PHYSICAL_VOLUME = 1
+    static DEFAULT_PHYSICAL_MASS = 1
+
+    // public position: Vec3 = new Vec3() // inherited from THREE.Object3D as default Vec(0,0,0)
+
+    protected mesh: THREE.Mesh
+    geometry: THREE.SphereGeometry
+    material: THREE.MeshLambertMaterial
+
+    public acceleration: Vec3 = new Vec3(0, 0, 0)
+    public velocity: Vec3 = new Vec3(0, 0, 0)
+
+    constructor(
+         position?: Vec3,  
+         velocity?: Vec3,
+         angularVelocity = new Vec3(0, 0, 0),
+         color = 0x4cb7a5
+    ) {
+        super()
+
+        this.geometry = new THREE.SphereGeometry(ParticleBase.DEFAULT_DRAW_RADIUS, 8, 4)
+        this.material = new THREE.MeshLambertMaterial({ color: color })
+
+        this.mesh = new THREE.Mesh(this.geometry, this.material)
+        this.add(this.mesh)
+
+        if (position) {
+            this.position.set(position.x, position.y, position.z)
+        }
+
+        if (velocity) {
+            this.velocity.set(velocity.x, velocity.y, velocity.z)
+        }
+
+        /* if (velocity.length() > 0) {
+            let velocityArrow = new THREE.ArrowHelper(velocity, this.position, length, 0xff0000)
+            this.add(velocityArrow)
+        } */
+
+        let l = angularVelocity.length()
+        if (l > 0) {
+
+            console.log(angularVelocity)
+            console.log(l)
+    
+            let vorticityArrow = new FIVE.ArrowHelper(
+                angularVelocity.clone().normalize(),
+                new Vec3(0,0,0), // this.position, // new Vec3(0,0,0), // this.position,
+                l,
+                0x00ffff)
+            this.add(vorticityArrow)
+        }
+        // this.mesh.quaternion.set(q.x, q.y, q.z, q.w);
+    }
+}
+
+abstract class ParticleBase5D extends FIVE.Object5D implements PhysicalEntity {
 
     static DEFAULT_DRAW_RADIUS = 0.015 //0.01 //0.006
     static DEFAULT_PHYSICAL_RADIUS = 1
@@ -64,11 +124,11 @@ abstract class ParticleBase extends FIVE.Object5D implements PhysicalEntity {
             console.log(angularVelocity)
             console.log(l)
     
-            let vorticityArrow = new FIVE.ArrowHelper(
+            let vorticityArrow = new FIVE.ArrowHelper5D(
                 angularVelocity.clone().normalize(),
                 new Vec3(0,0,0), // this.position, // new Vec3(0,0,0), // this.position,
                 l,
-                0x00ff00)
+                0x00ffff)
             this.add(vorticityArrow)
         }
         // this.mesh.quaternion.set(q.x, q.y, q.z, q.w);

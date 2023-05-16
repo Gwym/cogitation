@@ -612,7 +612,7 @@ abstract class SesamVerifier extends Sesam { // implements Iterable<TestFunction
     testIndex = 0
     testSuccess = true
 
-    abstract tests: TestFunctionInterface[] = []
+    abstract tests: TestFunctionInterface[] // = []
     //  testIterator: Iterator<TestFunctionInterface | undefined>
 
     constructor(ctx: VerifyContext) {

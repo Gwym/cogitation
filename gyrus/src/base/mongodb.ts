@@ -10,10 +10,12 @@ import {
 } from '../services/persistor'
 import { MessageType, XLoginRequest, ErrMsg, XRegistrationRequest, UserSessionAck, UserOptions, BaseAdminInformations } from "../services/shared/messaging"
 import { UserSession } from "../services/dispatcher"
-import { InsertWriteOpResult, MongoClient, Db, Collection, WriteError, ObjectID, BulkWriteResult } from "mongodb"
+// import { InsertWriteOpResult, MongoClient, Db, Collection, WriteError, ObjectID, BulkWriteResult } from "mongodb"
+import { InsertOneResult, MongoClient, Db, Collection, ObjectId, BulkWriteResult } from "mongodb"
 
 //export interface UpdateResult extends UpdateWriteOpResult { }
-export interface InsertResult extends InsertWriteOpResult<{ _id: any }> { }
+// export interface InsertResult extends InsertOneWriteOpResult<{ _id: any }> { }
+export interface InsertResult extends InsertOneResult<{ _id: any }> { }
 // export interface BulkSaveResult extends BulkWriteResult { }
 
 export class BaseMongoPersistor extends AsyncPersistor {
@@ -29,21 +31,22 @@ export class BaseMongoPersistor extends AsyncPersistor {
 
             // https://github.com/mongodb/node-mongodb-native/blob/master/CHANGES_3.0.0.md
 
-          /*  Mongo.MongoClient.connect(mongoUrl, {}, (err, mdb) => {
+            /*  Mongo.MongoClient.connect(mongoUrl, {}, (err, mdb) => {
+  
+                  if (err !== null) {
+                      console.log(err)
+                      reject(err)
+                  }
+  
+                  this.dbConnection = mdb
+                  this.tracks = mdb.collection('tracks')
+  
+                  resolve(this)
+              }) */
 
-                if (err !== null) {
-                    console.log(err)
-                    reject(err)
-                }
-
-                this.dbConnection = mdb
-                this.tracks = mdb.collection('tracks')
-
-                resolve(this)
-            }) */
-
-            MongoClient.connect(mongoUrl, { useNewUrlParser: true }).then((client) => {
-            //Mongo.MongoClient.connect(mongoUrl).then((mdb) => {
+            MongoClient.connect(mongoUrl, {}).then((client) => {
+                //MongoClient.connect(mongoUrl, { useNewUrlParser: true }).then((client) => {
+                //Mongo.MongoClient.connect(mongoUrl).then((mdb) => {
 
                 //  TODO (1) : if (mongo version >= 3.2 useLookup { 
                 // this.getPilotedRelList = this.getPilotedRelListLookup
@@ -73,7 +76,7 @@ export class BaseMongoPersistor extends AsyncPersistor {
                 dbg.error('Error connecting to Mongo. Message:\n' + err)
                 reject(err)
                 // throw (err) // FIXME (1) :  Promises used in callbacks does not catch mongo connection errors
-            }) 
+            })
         })
     }
 
@@ -90,12 +93,64 @@ export class BaseMongoPersistor extends AsyncPersistor {
 
     insertTrack(track: any) {
         if (this.tracks) {
-            this.tracks.insert(track)
+            this.tracks.insertOne(track)
         }
         // TODO (2) : else { connexion pending, store to memory }
     }
 
     getUserFromLogin(cmd: XLoginRequest): Promise<UserDao> {
+
+        return new Promise<UserDao>((resolve, reject) => {
+
+            if (this.users !== undefined) {
+
+
+                let userCursor = this.users.find({ mail: cmd.login })
+                    .limit(1)
+                    .project({ _id: true, hash: true, name: true })
+
+
+                userCursor.next().then(
+                    userDoc => {
+
+                        dbg.log('getUserFromLogin > find user:' + userDoc)
+                        dbg.log(JSON.stringify(userDoc))
+
+                        if (userDoc && userDoc._id && userDoc.name) {
+
+                            bcrypt.compare(cmd.password, userDoc.hash, function (err, res) {
+                                if (res) {
+                                    let userDao: UserDao = {
+                                        iId: userDoc._id.toHexString(),
+                                        name: userDoc.name
+                                    }
+                                    resolve(userDao)
+                                }
+                                else {
+                                    console.error('getUserFromLogin > bcrypt failed err:' + err + ' res: ' + res + ' user:' + userDoc)
+                                    reject(ErrMsg.LoginError) // PasswordError
+                                }
+                            })
+                        }
+                        else {
+                            console.error('getUserFromLogin > mongo failed user:' + userDoc)
+                            reject(ErrMsg.LoginError) // Login error
+                        }
+                    }
+                ).catch(err => {
+                    console.error('getUserFromLogin > mongo failed err:' + err)
+                    reject(ErrMsg.LoginError) // Login error 
+                }
+                )
+
+            }
+            else {
+                reject(ErrMsg.DatabaseError)
+            }
+        })
+    }
+
+    /*getUserFromLogin(cmd: XLoginRequest): Promise<UserDao> {
 
         return new Promise<UserDao>((resolve, reject) => {
 
@@ -136,7 +191,7 @@ export class BaseMongoPersistor extends AsyncPersistor {
                 reject(ErrMsg.DatabaseError)
             }
         })
-    }
+    }*/
 
     /*   generateCredential(expiration: Date): Promise<string> {
    
@@ -168,11 +223,11 @@ export class BaseMongoPersistor extends AsyncPersistor {
         return new Promise<UserSessionAck>((resolve, reject) => {
 
             // TODO (1) : hash birthdate
-            bcrypt.hash(userReg.password, 4, (err, hash) => { // TODO (1) : saltRound, err
+            bcrypt.hash(userReg.password, 4, (cryptErr, hash) => { // TODO (1) : saltRound, err
 
-                if (err) {
-                    dbg.error(err)
-                    reject(err)
+                if (cryptErr) {
+                    dbg.error(cryptErr)
+                    reject(cryptErr)
                     return
                 }
 
@@ -188,38 +243,45 @@ export class BaseMongoPersistor extends AsyncPersistor {
                         hash: hash
                     }
 
+                    // TODO axait https://www.mongodb.com/docs/drivers/node/current/usage-examples/insertOne/
                     // TODO (1) : check invitation code, reject(ErrMsg.InvalidCode)
                     //  this.users.findOneAndReplace({ invitationCode: userReg.code }, { mail: userReg.mail }, (err, res) => {
 
-                    this.users.insertOne(userDocument, (err, res) => {
-                        if (err === null && res.result.ok && res.insertedCount === 1) {
-                            dbg.log('createUser > OK ' + userDocument)
+                    let insertUserPromise = this.users.insertOne(userDocument)
+
+                    insertUserPromise.then(
+                        (res) => {
+                            // if (res.result.ok && res.insertedCount === 1) {
+                            dbg.log('createUser > OK ' + userDocument + ' res:' + res)
                             let userAck: UserSessionAck = { type: MessageType.User, userOptions: { name: userDocument.name } }
                             resolve(userAck)
-                        }
-                        else {
-                            dbg.log(err)
+                            // }
 
-                            // FIXME (4) : typings problem ? err should be a WriteError, not a MongoError for insertOne operation
-                            // https://docs.mongodb.com/manual/reference/method/db.collection.insertOne/
-                            // example : { WriteError({"code":11000,"index":0,"errmsg":"E11000 duplicate key error collection: yenah.users index: name_1 dup key: { : \"test\" }","op":{"name":"test","mail":"test@test.fr","hash":"$2a$04$rgeUX7eSraGrtaW7S1Lp0O/0XR9Wya0K5.vuv.kFlIsJGoGcz0DMm","_id":"59589321bed74e09da709bcc"}})
-                            if (err.code === 11000) {
+                        }).catch(
+                            (err) => {
+                                dbg.log(err)
 
-                                if ((<WriteError><any>err).errmsg.indexOf('index: name') !== -1) {
-                                    reject(ErrMsg.DuplicateName)
-                                    return
+                                // FIXME (4) : typings problem ? err should be a WriteError, not a MongoError for insertOne operation
+                                // https://docs.mongodb.com/manual/reference/method/db.collection.insertOne/
+                                // example : { WriteError({"code":11000,"index":0,"errmsg":"E11000 duplicate key error collection: yenah.users index: name_1 dup key: { : \"test\" }","op":{"name":"test","mail":"test@test.fr","hash":"$2a$04$rgeUX7eSraGrtaW7S1Lp0O/0XR9Wya0K5.vuv.kFlIsJGoGcz0DMm","_id":"59589321bed74e09da709bcc"}})
+                                if (err.code === 11000) {
+
+                                    if (err.errmsg.indexOf('index: name') !== -1) {
+                                        reject(ErrMsg.DuplicateName)
+                                        return
+                                    }
+                                    else if (err.errmsg.indexOf('index: mail') !== -1) {
+                                        reject(ErrMsg.DuplicateMail)
+                                        return
+                                    }
                                 }
-                                else if ((<WriteError><any>err).errmsg.indexOf('index: mail') !== -1) {
-                                    reject(ErrMsg.DuplicateMail)
-                                    return
-                                }
+
+                                dbg.error(err)
+
+                                reject(ErrMsg.DatabaseError)
+
                             }
-
-                            dbg.error(err)
-
-                            reject(ErrMsg.DatabaseError)
-                        }
-                    })
+                        )
                 }
                 else {
                     reject(ErrMsg.DatabaseError)
@@ -236,7 +298,7 @@ export class BaseMongoPersistor extends AsyncPersistor {
         getUserFromSession(sessionId: string): Promise<any[]> {
      
                  return this.sessions.aggregate([
-                     { $match: { _id: Mongo.ObjectID.createFromHexString(sessionId) } },
+                     { $match: { _id: Mongo.ObjectId.createFromHexString(sessionId) } },
                      { $limit: 1 },
                  { $lookup: {
                          from: 'users',
@@ -252,7 +314,7 @@ export class BaseMongoPersistor extends AsyncPersistor {
     
             return new Promise<UserDao>((resolve, reject) => {
     
-                let sid: Mongo.ObjectID = Mongo.ObjectID.createFromHexString(sessionId)
+                let sid: Mongo.ObjectId = Mongo.ObjectId.createFromHexString(sessionId)
     
                 this.sessions.find({ _id: sid })
                     .limit(1)
@@ -290,7 +352,7 @@ export class BaseMongoPersistor extends AsyncPersistor {
     
             // TODO (0) : cookieExpiration
             return new Promise<string>((resolve, reject) => {
-                this.sessions.insertOne({ user_id: Mongo.ObjectID.createFromHexString(userAbsIId.toString()) }, (err, result: Mongo.InsertOneWriteOpResult) => {
+                this.sessions.insertOne({ user_id: Mongo.ObjectId.createFromHexString(userAbsIId.toString()) }, (err, result: Mongo.InsertOneWriteOpResult) => {
                     if (err != null) {
                         console.error('generateSessionId > err:' + err)
                         reject(<s2c_ChannelMessage>{ type: MessageType.Error, toStringId: ToStringId.DatabaseError }) // TODO (5) : MongoError -> ClientError
@@ -317,11 +379,11 @@ export class BaseMongoPersistor extends AsyncPersistor {
 
         for (let dao of daos) {
             if (dao.varAttr) {
-                bulk.find({ _id: ObjectID.createFromHexString(dao.iId.toString()) }).update({ $set: { varAttr: dao.varAttr } })
+                bulk.find({ _id: ObjectId.createFromHexString(dao.iId.toString()) }).update({ $set: { varAttr: dao.varAttr } })
 
             }
             else if (dao.full) {
-                bulk.find({ _id: ObjectID.createFromHexString(dao.iId.toString()) }).upsert().update({ $set: dao.full })
+                bulk.find({ _id: ObjectId.createFromHexString(dao.iId.toString()) }).upsert().update({ $set: dao.full })
             }
             else {
                 throw 'Invalid saveById dao collection'
@@ -352,10 +414,12 @@ export class BaseMongoPersistor extends AsyncPersistor {
         // TODO (1) : disconnect users
         // this.users.drop() 
         if (this.sessions && collectionsToDrop.indexOf(CollectionId.Session) !== -1) {
-            this.sessions.drop(function (err, res) { dbg.log('db.dropCollections > drop sessions ' + (err ? err : '') + (res ? ' res:' + res : '')) })
+            this.sessions.drop().then((res) => { dbg.log('db.dropCollections > drop sessions ' + (res ? ' res:' + res : '')) })
+                .catch((err) => { dbg.error('db.dropCollections > drop sessions ' + err) })
         }
         if (this.users && collectionsToDrop.indexOf(CollectionId.User) !== -1) {
-            this.users.drop(function (err, res) { dbg.log('db.dropCollections > drop users ' + (err ? err : '') + (res ? ' res:' + res : '')) })
+            this.users.drop().then((res) => { dbg.log('db.dropCollections > drop users ' + (res ? ' res:' + res : '')) })
+            .catch((err) => { dbg.error('db.dropCollections > drop users ' + err) })
         }
 
 

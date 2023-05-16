@@ -1,4 +1,4 @@
-// Original sources and authors : see THREE.js
+// ~ THREE.js => ts
 
 namespace FIVE {
 
@@ -35,21 +35,21 @@ namespace FIVE {
         
     }
 
-    export class BufferGeometry extends THREE.BufferGeometry {
+    export class BufferGeometry5D extends THREE.BufferGeometry {
 
         parameters: { [index: string]: string | number } = {}
     }
 
-    export class Geometry extends THREE.Geometry {
+    /* export class Geometry extends THREE.Geometry {
 
         parameters: { [index: string]: string | number } = {}
-    }
+    }*/
 
     export class Material extends THREE.Material {
 
     }
 
-    export class SphereBufferGeometry extends BufferGeometry {
+    export class SphereBufferGeometry extends BufferGeometry5D {
 
         /* parameters: {
              radius: number
@@ -162,13 +162,13 @@ namespace FIVE {
             // build geometry
 
             this.setIndex(indices)
-            this.addAttribute('position', new Float32BufferAttribute(vertices, 3))
-            this.addAttribute('normal', new Float32BufferAttribute(normals, 3))
-            this.addAttribute('uv', new Float32BufferAttribute(uvs, 2))
+            this.setAttribute('position', new Float32BufferAttribute(vertices, 3))
+            this.setAttribute('normal', new Float32BufferAttribute(normals, 3))
+            this.setAttribute('uv', new Float32BufferAttribute(uvs, 2))
         }
     }
 
-    export class TorusBufferGeometry extends BufferGeometry {
+    export class TorusBufferGeometry extends BufferGeometry5D {
 
         parameters: {
             radius: number
@@ -265,9 +265,9 @@ namespace FIVE {
             // build geometry
 
             this.setIndex(indices);
-            this.addAttribute('position', new Float32BufferAttribute(vertices, 3));
-            this.addAttribute('normal', new Float32BufferAttribute(normals, 3));
-            this.addAttribute('uv', new Float32BufferAttribute(uvs, 2));
+            this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+            this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
+            this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
         }
     }
 
@@ -306,10 +306,6 @@ namespace FIVE {
     }
 
 
-
-
-
-
     // export abstract class Object5D extends THREE.Object3D {
     export abstract class Object5D extends THREE.EventDispatcher { // THREE.Object3D { 
 
@@ -328,7 +324,7 @@ namespace FIVE {
         static DefaultMatrixAutoUpdate = true
 
         id: number = Object5D.object5DId++
-        uuid: string = THREE.Math.generateUUID()
+        //uuid: string = THREE.Math.generateUUID()
         name: string = ''
         type: string = 'Object5D'
 
@@ -372,23 +368,22 @@ namespace FIVE {
         // !! not cloned
         userData: { [key: string]: any } = {}
 
-        abstract geometry: Geometry | BufferGeometry
+        // abstract geometry: Geometry | BufferGeometry
+        abstract geometry: BufferGeometry5D
         abstract material: Material
 
-        onBeforeRender = (_renderer: THREE.WebGLRenderer, _scene: Scene, _camera: THREE.Camera, _geometry: Geometry | BufferGeometry,
+        onBeforeRender = (_renderer: THREE.WebGLRenderer, _scene: Scene, _camera: THREE.Camera, _geometry: BufferGeometry5D,
             _material: Material, _group: THREE.Group): void => { }
 
 
-        onAfterRender = (_renderer: THREE.WebGLRenderer, _scene: Scene, _camera: THREE.Camera, _geometry: Geometry | BufferGeometry,
+        onAfterRender = (_renderer: THREE.WebGLRenderer, _scene: Scene, _camera: THREE.Camera, _geometry: BufferGeometry5D,
             _material: Material, _group: THREE.Group): void => { }
-
-
 
         constructor() {
             super()
 
-            this.rotation.onChange(this.onRotationChange)
-            this.quaternion.onChange(this.onQuaternionChange)
+           //this.rotation._onChange(this.onRotationChange)
+           //this.quaternion._onChange(this.onQuaternionChange)
         }
 
         // This updates the position, rotation and scale with the matrix.
@@ -416,7 +411,7 @@ namespace FIVE {
 
         setRotationFromEuler(euler: Euler) {
 
-            this.quaternion.setFromEuler(euler, true)
+            this.quaternion.setFromEuler(euler)
         }
 
         setRotationFromMatrix(m: Matrix4) {
@@ -532,7 +527,7 @@ namespace FIVE {
         worldToLocal(vector: Vector3) {
 
             let m1 = new Matrix4()
-            return vector.applyMatrix4(m1.getInverse(this.matrixWorld))
+            return vector.applyMatrix4(m1.invert(/* this.matrixWorld*/))
         }
 
         /**
@@ -578,7 +573,7 @@ namespace FIVE {
 
                 m1.extractRotation(parent.matrixWorld);
                 q1.setFromRotationMatrix(m1);
-                this.quaternion.premultiply(q1.inverse());
+                this.quaternion.premultiply(q1.invert());
 
             }
 
@@ -945,7 +940,7 @@ namespace FIVE {
 
             let object: any = {};
 
-            object.uuid = this.uuid;
+            // object.uuid = this.uuid;
             object.type = this.type;
 
             if (this.name !== '') object.name = this.name;
@@ -1140,17 +1135,38 @@ namespace FIVE {
 
         onRotationChange = () => {
 
-            this.quaternion.setFromEuler(this.rotation, false)
+            this.quaternion.setFromEuler(this.rotation)
         }
 
         onQuaternionChange = () => {
 
-            this.rotation.setFromQuaternion(this.quaternion, undefined, false)
+            this.rotation.setFromQuaternion(this.quaternion, undefined)
         }
     }
 
     // FIXME (1) : THREE dependant, scene belongs to scenario.ts, not to model, extract scene from 3d models
-    export class Scene extends Object5D implements ScenarioInterface {
+
+    export class Scene extends THREE.Scene implements ScenarioInterface {
+
+        protected animationStepOptions: AnimationStepOptions = {
+        }
+
+        sceneBaseLength: number = 0
+        physicalStepPerVisualStep = 1
+        fov = 24
+        near = 1
+        far = 2000
+        ambientColor = 0x222222
+
+        defaultInitScenarioId = 0 // FIXME : constructor options => default scenario ?
+
+        setAnimationStepOptions(visualStepOptions: AnimationStepOptions): void {
+            this.animationStepOptions = visualStepOptions
+        }
+
+    }
+
+    /* export class Scene extends Object5D implements ScenarioInterface {
 
         protected animationStepOptions: AnimationStepOptions = {
         }
@@ -1170,7 +1186,7 @@ namespace FIVE {
 
         // THREE
 
-        geometry!: Geometry | BufferGeometry
+        geometry!: BufferGeometry
         material!: Material
 
         isScene = true
@@ -1188,7 +1204,7 @@ namespace FIVE {
         }
 
         //  A fog instance defining the type of fog that affects everything rendered in the scene. Default is null.
-        fog: THREE.IFog | null
+        fog: THREE.Fog | null
 
         // If not null, it will force everything in the scene to be rendered with that material. Default is null.
 
@@ -1229,7 +1245,7 @@ namespace FIVE {
 
             this.dispatchEvent({ type: 'dispose' })
         }
-    }
+    } */
 
 
     export class Mesh extends Object5D {
@@ -1240,12 +1256,12 @@ namespace FIVE {
         isMesh = true
         type = 'Mesh'
 
-        geometry: Geometry | BufferGeometry
+        geometry: BufferGeometry5D
         material: Material
 
 
         constructor(
-            geometry: Geometry | BufferGeometry = new BufferGeometry(),
+            geometry: BufferGeometry5D = new BufferGeometry5D(),
             material: Material /*| Material[]*/ = new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff })
         ) {
             super()
@@ -1268,7 +1284,7 @@ namespace FIVE {
             var m, ml, name;
 
             // if ( geometry.isBufferGeometry ) {
-            if (geometry instanceof BufferGeometry) {
+            if (geometry instanceof BufferGeometry5D) {
 
                 var morphAttributes = geometry.morphAttributes;
                 var keys = Object.keys(morphAttributes);
@@ -1297,13 +1313,14 @@ namespace FIVE {
 
             } else {
 
-                var morphTargets = geometry.morphTargets;
+               /* var morphTargets = geometry.morphTargets;
 
                 if (morphTargets !== undefined && morphTargets.length > 0) {
 
                     console.error('THREE.Mesh.updateMorphTargets() no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.');
 
-                }
+                } */
+                console.error('THREE no longer supports THREE.Geometry. Use THREE.BufferGeometry instead.')
 
             }
 
@@ -1337,19 +1354,19 @@ namespace FIVE {
 
     export class Points extends Object5D {
 
-        geometry: Geometry | BufferGeometry
+        geometry: BufferGeometry5D
         material: Material //| Material[]
 
         type = "Points"
         isPoints = true
         
         constructor(
-            geometry?: Geometry | BufferGeometry,
+            geometry?: BufferGeometry5D,
             material?: Material // | Material[]
         ) {
             super()
 
-            this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
+            this.geometry = geometry !== undefined ? geometry : new BufferGeometry5D();
             this.material = material !== undefined ? material : new THREE.PointsMaterial( { color: Math.random() * 0xffffff } );
         }
     
@@ -1365,18 +1382,18 @@ namespace FIVE {
 
         isLine = true
 
-        geometry: Geometry | BufferGeometry
+        geometry: BufferGeometry5D
         material: Material
 
         protected start = new Vector3()
         protected end = new Vector3()
 
-        constructor(geometry?: Geometry | BufferGeometry, material?: Material) {
+        constructor(geometry?: BufferGeometry5D, material?: Material) {
             super()
 
             this.type = 'Line'
 
-            this.geometry = geometry !== undefined ? geometry : new BufferGeometry()
+            this.geometry = geometry !== undefined ? geometry : new BufferGeometry5D()
             this.material = material !== undefined ? material : new THREE.LineBasicMaterial({ color: Math.random() * 0xffffff })
 
         }
@@ -1387,7 +1404,7 @@ namespace FIVE {
 
             // if ( geometry.isBufferGeometry ) {
 
-            if (geometry instanceof BufferGeometry) {
+            if (geometry instanceof BufferGeometry5D) {
 
                 // we assume non-indexed geometry
 
@@ -1405,7 +1422,7 @@ namespace FIVE {
                         lineDistances[i + 1] = lineDistances[i] + this.start.distanceTo(this.end)
                     }
 
-                    geometry.addAttribute('lineDistance', new Float32BufferAttribute(lineDistances, 1))
+                    geometry.setAttribute('lineDistance', new Float32BufferAttribute(lineDistances, 1))
 
                 } else {
 
@@ -1413,7 +1430,7 @@ namespace FIVE {
                 }
 
                 // } else if ( geometry.isGeometry ) {
-            } else if (geometry instanceof Geometry) {
+            } /*else if (geometry instanceof BufferGeometry) {
 
                 let vertices = geometry.vertices
                 let lineDistances = geometry.lineDistances
@@ -1426,7 +1443,7 @@ namespace FIVE {
                     lineDistances[i] = (i === 0) ? 0 : lineDistances[i - 1]
                     lineDistances[i + 1] = lineDistances[i] + this.start.distanceTo(this.end)
                 }
-            }
+            }*/
 
             return this
         }
@@ -1443,7 +1460,7 @@ namespace FIVE {
 
         isLineSegments = true
 
-        constructor(geometry: BufferGeometry, material: Material) {
+        constructor(geometry: BufferGeometry5D, material: Material) {
 
             super(geometry, material);
 
@@ -1451,14 +1468,18 @@ namespace FIVE {
         }
     }
 
+    export class AxesHelper extends THREE.AxesHelper {
+
+        
+    }
+
     // X axis is red, Y axis is green, Z axis is blue.
-    export class AxesHelper extends LineSegments {
+    export class AxesHelper5D extends LineSegments {
 
         static xColor = 0xFF7F00
         static yColor = 0x007F00
         static zColor = 0x007FFF
-        static VertexColors = 2
-
+        static VertexColors = true //2
 
         constructor(size = 1) {
 
@@ -1474,40 +1495,44 @@ namespace FIVE {
                 0, 0, 1, 0, 0.6, 1
             ]
 
-            let geometry = new BufferGeometry()
-            geometry.addAttribute('position', new Float32BufferAttribute(vertices, 3))
-            geometry.addAttribute('color', new Float32BufferAttribute(colors, 3))
+            let geometry = new BufferGeometry5D()
+            geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3))
+            geometry.setAttribute('color', new Float32BufferAttribute(colors, 3))
 
-            let material = new THREE.LineBasicMaterial({ vertexColors: AxesHelper.VertexColors })
+            let material = new THREE.LineBasicMaterial({ vertexColors: AxesHelper5D.VertexColors })
 
             super(geometry, material)
         }
     }
 
 
+    export class ArrowHelper extends THREE.ArrowHelper {
+    }
+
 
     // let lineGeometry, coneGeometry;
 
-    export class ArrowHelper extends Object5D {
+    export class ArrowHelper5D extends Object5D {
 
         // FIXME (4) : geometry, material array
-        geometry: Geometry | BufferGeometry = new BufferGeometry()
+        geometry: BufferGeometry5D = new BufferGeometry5D()
         material: Material = new Material()
 
         line: Line
-        lineGeometry: BufferGeometry
+        lineGeometry: BufferGeometry5D
         cone: THREE.Mesh
-        coneGeometry: THREE.CylinderBufferGeometry
+        coneGeometry: THREE.CylinderGeometry
 
         axis = new THREE.Vector3()
         // radians: number
-
 
         constructor(dir?: THREE.Vector3, origin?: THREE.Vector3, length?: number, color?: number, headLength?: number, headWidth?: number) {
 
             // dir is assumed to be normalized
 
             super()
+
+            console.log('ARROW HELPER')
 
             if (dir === undefined) dir = new THREE.Vector3(0, 0, 1);
             if (origin === undefined) origin = new THREE.Vector3(0, 0, 0);
@@ -1517,10 +1542,10 @@ namespace FIVE {
             if (headWidth === undefined) headWidth = 0.2 * headLength;
 
 
-            this.lineGeometry = new BufferGeometry();
-            this.lineGeometry.addAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0, 0, 1, 0], 3));
+            this.lineGeometry = new BufferGeometry5D();
+            this.lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0, 0, 1, 0], 3));
 
-            this.coneGeometry = new THREE.CylinderBufferGeometry(0, 0.5, 1, 5, 1);
+            this.coneGeometry = new THREE.CylinderGeometry(0, 0.5, 1, 5, 1);
             this.coneGeometry.translate(0, - 0.5, 0);
 
             this.position.copy(origin);

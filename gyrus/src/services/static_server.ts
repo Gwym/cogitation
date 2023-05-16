@@ -114,7 +114,7 @@ export class StaticServer {
     serve(req: http.IncomingMessage, res: http.ServerResponse) {
 
         let pathname: string
-        let p = new Promise<any>((resolve, reject) => {
+        let p = new Promise<void>((resolve, reject) => {
             pathname = decodeURI(<string>url.parse(<string>req.url).pathname)
             // dbg.log('StaticServer.Serve > serving  URI ' + pathname)
             if (pathname === '/') {

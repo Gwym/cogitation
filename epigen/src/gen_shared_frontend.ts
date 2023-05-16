@@ -24,19 +24,27 @@ try {
     let configString = fs.readFileSync(epigenConfigFile).toString()
     let config = <EpigenConfigurationInterface>JSON.parse(configString)
     console.log(config.shared);
-    if (! config.shared || (!(config.shared instanceof Array))) {
+    if (!config.shared || (!(config.shared instanceof Array))) {
         console.error(configString);
         throw 'Epigen configuration file error';
     }
 
     let inFiles = config.shared
 
-    if (! config.outfilename || (typeof(config.outfilename) !== 'string')) {
+    if (!config.outfilename || (typeof (config.outfilename) !== 'string')) {
         console.error(configString);
         throw 'Epigen configuration file error';
     }
 
-    let outFilename = path.resolve(__dirname, config.outfilename)
+    const outFilename = path.resolve(__dirname, config.outfilename)
+    const outFilePath = path.dirname(outFilename)
+    
+    console.log('Checking for output directory : ' + outFilePath)
+    if (!fs.existsSync(outFilePath)) {
+        console.warn('Cannot find output directory : ' + outFilePath + ', please check outfilename in configuation :' + epigenConfigFile)
+        // fs.mkdirSync(outFilePath, { recursive: true })
+        process.exit(1)
+    }
 
     var outContent = '// WARNING : GENERATED FILE, DO NOT MODIFY (modify server shared files ' + "\n"
         + '// and run node epigen/gen_shared_frontend.js' + "\n\n";
